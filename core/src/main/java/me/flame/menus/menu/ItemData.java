@@ -196,7 +196,6 @@ public class ItemData {
     public void recreateItems(Inventory inventory) {
         int size = items.length;
         boolean updateStates = menu.updateStatesOnUpdate;
-        Bukkit.getLogger().info("Size of size before expected error: " + size);
         for (int itemIndex = 0; itemIndex < size; itemIndex++) {
             MenuItem item = items[itemIndex];
             if (item != null && updateStates && item.hasStates()) item.updateStates();
