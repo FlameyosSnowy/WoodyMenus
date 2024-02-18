@@ -20,6 +20,7 @@ import java.util.Objects;
  *
  * @see ForeignCompHolder
  * @since 0.10.0
+ * @author stefvanschie at <a href="https://github.com/stefvanschie/IF">IF's github.</a>
  */
 class NativeCompHolder extends CompHolder {
     
@@ -66,5 +67,13 @@ class NativeCompHolder extends CompHolder {
         List<Component> lore = new ArrayList<>();
         lore.add(value);
         meta.lore(lore);
+    }
+
+    @Override
+    public boolean contains(@NotNull TextHolder string) {
+        if (string instanceof CompHolder) {
+            return this.value.contains(((CompHolder) string).component());
+        }
+        return this.value.toString().contains(string.toString());
     }
 }

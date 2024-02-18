@@ -9,6 +9,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 /**
  * Immutable wrapper of a text-like value.
  * Support for both Adventure and legacy strings is achieved through this class.
@@ -19,7 +21,8 @@ import org.jetbrains.annotations.NotNull;
  *
  * @see StringHolder
  * @see CompHolder
- * @since 0.10.0
+ * @since 2.0.0
+ * @author stefvanschie at <a href="https://github.com/stefvanschie/IF">IF's github.</a>
  */
 public abstract class TextHolder {
     
@@ -33,6 +36,18 @@ public abstract class TextHolder {
     @Contract(pure = true)
     public static TextHolder empty() {
         return StringHolder.empty();
+    }
+
+    /**
+     * Gets an instance of Lore that contains no characters and no formatting.
+     *
+     * @return an instance without any characters or formatting
+     * @since 2.0.1
+     */
+    @NotNull
+    @Contract(pure = true)
+    public static Lore emptyLore() {
+        return Lore.empty();
     }
     
     /**
@@ -61,19 +76,32 @@ public abstract class TextHolder {
      * @param holder the holder to use for the new inventory
      * @param type the type of inventory to create
      * @return a newly created inventory with the wrapped value as its title
-     * @since 0.10.0
+     * @since 2.0.0
      */
     @NotNull
     @Contract(pure = true)
     public abstract Inventory toInventory(InventoryHolder holder, InventoryType type);
-    
+
+    /**
+     * Takes the lore from the specified meta.
+     * <p>
+     * If the meta has no lore, this method returns {@link #emptyLore()}
+     * @param meta the meta to take the lore from
+     * @return the lore from the meta with compatibility for legacy strings and components.
+     *         or it may return {@link #emptyLore()} if the meta has no lore
+     * @since 2.0.1
+     */
+    public Lore takeLore(ItemMeta meta) {
+        return meta == null ? Lore.empty() : new Lore(meta);
+    }
+
     /**
      * Creates a new inventory with the wrapped value as the inventory's title.
      *
      * @param holder the holder to use for the new inventory
      * @param size the count of slots the inventory should have (normal size restrictions apply)
      * @return a newly created inventory with the wrapped value as its title
-     * @since 0.10.0
+     * @since 2.0.0
      */
     @NotNull
     @Contract(pure = true)
@@ -83,7 +111,7 @@ public abstract class TextHolder {
      * Modifies the specified meta: sets the display name to the wrapped value.
      *
      * @param meta the meta whose display name to set
-     * @since 0.10.0
+     * @since 2.0.0
      */
     public abstract void asItemDisplayName(ItemMeta meta);
     
@@ -91,7 +119,7 @@ public abstract class TextHolder {
      * Modifies the specified meta: adds the wrapped value as a new lore line at the end
      *
      * @param meta the meta whose lore to append to
-     * @since 0.10.0
+     * @since 2.0.0
      */
     public abstract void asItemLoreAtEnd(ItemMeta meta);
 
@@ -99,7 +127,7 @@ public abstract class TextHolder {
      * Modifies the specified meta: sets the lore to the value
      *
      * @param meta the meta whose lore to append to
-     * @since 0.10.0
+     * @since 2.0.0
      */
     public abstract void asItemLore(ItemMeta meta);
 
@@ -108,10 +136,12 @@ public abstract class TextHolder {
      * keeping the original formatting.
      *
      * @return the wrapped value represented as a legacy string
-     * @since 0.10.0
+     * @since 2.0.0
      */
     @NotNull
     @Override
     @Contract(pure = true)
     public abstract String toString();
+
+    public abstract boolean contains(@NotNull TextHolder holder);
 }

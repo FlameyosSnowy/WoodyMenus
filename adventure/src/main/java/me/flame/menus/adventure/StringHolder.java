@@ -1,5 +1,6 @@
 package me.flame.menus.adventure;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.InventoryType;
 
@@ -21,7 +22,8 @@ import static org.bukkit.ChatColor.translateAlternateColorCodes;
  * Wrapper of a legacy string value.
  * {@link org.bukkit.ChatColor} based formatting is used.
  *
- * @since 0.10.0
+ * @since 2.0.0
+ * @author stefvanschie at <a href="https://github.com/stefvanschie/IF">IF's github.</a>
  */
 @SuppressWarnings("deprecation")
 public final class StringHolder extends TextHolder {
@@ -78,7 +80,12 @@ public final class StringHolder extends TextHolder {
     public String toString() {
         return value;
     }
-    
+
+    @Override
+    public boolean contains(@NotNull TextHolder string) {
+        return this.value.contains(string.toString());
+    }
+
     @Override
     public int hashCode() {
         return value.hashCode();

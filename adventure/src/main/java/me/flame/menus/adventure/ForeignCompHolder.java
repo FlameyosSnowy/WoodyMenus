@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @see NativeCompHolder
  * @since 0.10.0
+ * @author stefvanschie at <a href="https://github.com/stefvanschie/IF">IF's github.</a>
  */
 class ForeignCompHolder extends CompHolder {
     @NotNull
@@ -52,5 +53,10 @@ class ForeignCompHolder extends CompHolder {
     @Override
     public void asItemLore(ItemMeta meta) {
         legacy.asItemLore(meta);
+    }
+
+    @Override
+    public boolean contains(@NotNull TextHolder string) {
+        return this.legacy.contains(string);
     }
 }

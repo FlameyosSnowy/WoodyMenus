@@ -1,156 +1,177 @@
-# Woody
-### THIS IS BASED OFF TRIUMPH-GUI. SHOUT OUT TO TRIUMPHTEAM.
-triumph-gui: https://github.com/TriumphTeam/triumph-gui
+## Woody - High-performance, feature-rich no BS menus library
+[![](https://dcbadge.vercel.app/api/server/Zj6KBS7UwX)](https://discord.gg/Zj6KBS7UwX)
 
-No BS High-performance, Minimal and Safe Menus Library
+This is ~~full of stolen code~~ based off [triumph-gui](https://github.com/TriumphTeam/triumph-gui)
 
-If you need support, Check out the official discord server for help using my plugin/libraries [right here](https://discord.gg/Zj6KBS7UwX)
+## Why Woody?
+- Woody is really easy
 
-## Why use menu libraries?
-Menu libraries have stuck around our community for a long time.
+  Woody is very easy to get started by looking at a few java documentation.
+  Even easier when you come from triumph-gui because it's somewhat similar to triumph-gui.
+  Just create the menu via `Menu.create` or use `Menu.builder` to build a Menu.
+  
+  Creating a paginated menu is JUST as easy.
 
-When making menus yourself you need to adjust it properly to these key features:
-- Performance
-- Safety
-- Proper code
-- Features
-- Way of usage
+- Woody is very Flexible
 
-and whether you want to make something like a `Menu`, make your own library or "mini-library" for you or even just use raw spigot inventories,
+  With all these actions for menus, default click actions, outside, top, bottom,
+  actions before animations, actions after page change, interfaces, etc, you just CAN'T resist the incredible flexibility of Woody.
 
-You have to think of the key features and implement them properly, you also might need a lot of menus so that's a lot of events and boring stuff.
+  and not just the actions and some of common interfaces.
+  
+- Woody is powerful and fast
+  
+  Woody has an amazing API for you to work with and powerful features designed to make your coding journey fun!
+  Such as:
+  - Dynamically changing States to add in **MenuItem** lore.
 
-That's where menu libraries/frameworks come in and save the day.
-
-You have menu libraries and you use one or some of them, and they tend to have this eyecandy syntax of making menus
-
-you also seem to notice you don't write as much as you would when using the raw spigot inventories and handling all the events yourself and making 20 classes where one is for each inventory
-
-It's all even handled in one singular event.
-
-Some libraries **Such as InventoryFramework, triumph-gui, or mine** even provide other kinds of menus such as Paginated, and more variants of inventories that would be a pain to implement.
-
-This is why you would want to use a menu library, to save the hassle of making your own raw inventories and events
-
-## Why Woody? Why not triumph-gui? Why not InventoryFramework? Why not anything else?
-Woody is minimal, Woody is also feature rich, Woody is fast.
-triumph-gui is great, and especially IF which is amazing.
-
-Now I don't know about OTHER frameworks, but Woody provides some special features such as:
-- Nice Support; everyone likes nice support, I have a lot of free time! (mostly, even if I try to have a life, and no I'm not obese)
-- MenuItem editing AFTER CREATION; 
-  I had this problem of trying to edit gui/menu items after creation in some libraries like triumph-gui and others
-  When making this library I'd also been mentioned a couple times how frustrating it can get to edit a menu item
-  after creation, even with a menu library, (triumph-gui v3.1.2 case) you need to:
-
-    Get the item stack from the gui item
-
-    Get the item meta from the item stack
-
-    Manually edit the item meta
-
-    Manually set the item meta
-
-    Update the item
-
-    For Gui it would look something like this:
-
+    A straight forward example:
     ```java
-    GuiItem guiItem = gui.getGuiItem(20); // 20 just as an example
-    ItemStack item = guiItem.getItemStack();
-    ItemMeta meta = item.getItemMeta();
-    // do what you want with the meta/item
-    gui.updateItem(20, item);
+    MenuItem item = ...;
+    // Let's declare the lore of "item" to be this:
+    /*
+     * Hello World!
+     * The coolest player currently alive is FlameyosFlow out of %players% players in the server
+     */
+    item.addState(State.of("%players%", () -> Bukkit.getOnlinePlayers().size(), item));
+
+    Menu menu = ...;
+    menu.setUpdateStatesOnUpdate(true); // this exists for performance reasons
+    ```
+  - Menu#getFiller and PaginatedMenu#getPageDecoration to make decorating menus easy in a fast manner.
+
+    For example: ~~This will make your code better since your code sux anyways~~
+    ```java
+    Menu menu = ...; // we'll call this "present" Menu object "menu"
+    Filler filler = menu.getFiller();
+    filler.fillBorder(Material.STONE); // most recommended when working with glass panes on newer versions
+    filler.fillBorder(new ItemStack(Material.STONE)); // most recommended when working with glass panes on legacy
+    filler.fillBorder(ItemBuilder.of(Material.STONE).buildItem()); // most recommended for ANYTHING else
+
+    // More exist, such as Filler#fill to fill every slot where [slot != null]
+    // Filler#fillRow, Filler#fillArea, etc.
+
+    // For PageDecoration just use PaginatedMenu#getPageDecoration and it should be looking just the same.
+    ```
+  - Easy **MenuItem** editing via `MenuItem#editor` like no other library.
+
+    A straight forward example: ~~if you use an item meta no wonder everyone says your code sux fr~~
+    ```java
+    MenuItem item = ...; // an already existing MenuItem needs to be present, let's call this "item"
+    item.editor()
+        .setLore("I am an edited lore", "I now exist! :D")
+        .setName("Wussuh I'm edited")
+        .enchant(Enchantment.DAMAGE_ALL)
+        .setCustomModelData(53) // completely random model data
+        .done(); // no need to update the item on any menu, it will automatically change :D
+    ```
+  - Amazing native/legacy **adventure** support. (I cutely asked [IF's](https://github.com/stefvanschie/IF) owner for this :D)
+    
+    To use Adventure just use `TextHolder` or `CompHolder` parameters instead of `String`
+  - Easy layout building using MenuLayoutBuilder
+    
+    To build using a string array of layouts here's how you do it:
+    ```java
+    Map<Character, MenuItem> items = Map.of(
+        'X', ItemBuilder.of(Material.STONE).buildItem(),
+        'Y', ItemBuilder.of(Material.CARROT).buildItem((slot, event) -> Bukkit.getLogger().info("A carrot got clicked!")
+    );
+
+    Menu menu = MenuLayoutBuilder.bind(items).pattern("XXXXXXXXX", "XYY   YYX", "XXXXXXXXX").createMenu("&4Sick Menu Building", EnumSet.allOf(Modifier.class));
+   ```
+   ```
+
+  - Powerful Animating API for your menus (Inspired by [this pull request](https://github.com/TriumphTeam/triumph-gui/pull/49) from TWO YEARS AGO for triumph-gui)
+    
+    An example of a few frames animating every 10 ticks (500ms)
+    ```java
+    Menu menu = ...;
+    Animation animation = Animation.builder(menu)
+                   .frames(
+                       Frame.builder(menu).addItems(
+                           ItemBuilder.of(Material.STONE).buildItem(),
+                           ItemBuilder.of(Material.CARROT).buildItem(),
+                           ...
+                        ).build(),
+                        Frame.builder(menu).addItems(
+                           ItemBuilder.of(Material.CAKE).buildItem(),
+                           ItemBuilder.of(Material.GRASS_BLOCK).buildItem(),
+                           ...
+                        ).build(),
+                        ...
+                   )
+                   .delay(10)
+                   .type(Animation.Type.REPEATED) // happens infinitely until the last viewer of the menu closes the menu
+                   .build();
+    menu.addAnimation(animation);
+    // will be animated autonomously on the first open of a menu after 0 viewers
+    ```
+  - SuperB flexible MenuIterator (by Mqzn originally :D)
+    A straight forward example:
+    ```java
+    Menu menu = ...;
+    for (MenuItem item : menu) {
+        // normal I guess 🤷‍♂️
+    }
+
+    // the power of this iterator
+    MenuIterator iterator = menu.iterator(1, 6); // will start from row 1, and column 6
+    // work with the Iterator object
+
+    // or some REAL power
+    MenuIterator iterator = menu.iterator(IterationDirection.VERTICAL);
+    // work with the Iterator object
+    // now the direction of this iterator will go vertically like (0, 9, 18, 27, 36, 45, 1, 10, 19, etc.) instead of
+    // horizontally like (0, 1, 2, 3, 4, 5, etc.)
+    
+    or an even more custom one:
+    MenuIterator iterator = menu.iterator(IterationDirection.RIGHT_DOWNWARDS_ONLY);
+    // work with the Iterator object
+    // now the direction will go from 0 to 50 like this: (refer to the X's)
+    /*
+    XYYYYYYYY
+    YXYYYYYYY
+    YYXYYYYYY
+    YYYXYYYYY
+    YYYYXYYYY
+    YYYYYXYYY
+    */
+    
+    // these iterations are not dependant on the size of the menu or the starting row and column, these directions
+    // work for ALL cases as long as you don't mess up the starting row and/or column.
     ```
 
-    Horrendous! What is this? it may even look the same in raw spigot inventories! maybe slightly better, slightly worse.
-    Here is the Woody way:
+- And **SO MUCH MORE!**
 
-    ```java
-    menu.getItem(20).editor() // edit.
-        .done(); // when you execute ItemEditor#done() it will literally change the itemStack and action of that object.
-    // on v1.3.4 and under you needed to set the item or update it but thats no longer the case.
-    ```
-    Now you're going to likely write a lot less, have realistically the same performance impact and enjoy readable & concise code.
+There are just SO many stuff about woody you can't resist!
 
-There can be a lot more too, other than these key features (for now), you might find it as a regular time-saving menu libraries
+## Getting Started
+Obviously you can't **resist all these cool features** and both of us know we're gonna use half to all of these features!
 
-## Features, How to add, and Example Usage
-
-### Key features (Including but not limited to):
-- Updating safely recreates all the items; leading to *EXPECTED* automatic updating.
-- Supports legacy versions **<1.13.2** (and that impacts performance ._.)
-- I don't have the worst support in the world (I try my best :D)
-- Actually fast and cares about performance
-- JVM friendly
-- Minimal
-- And more.
-
-This library is hosted on Jitpack.
+Here's how to add Woody to your ~~bad~~ code:
 ```xml
 <repositories>
-  <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-  </repository>
-  ...
+    <repository>
+        <groupId>com.github.coderFlameyosFlow.WoodyMenus</groupId>
+        <artifactId>core</artifactId>
+        <version>2.0.6</version>
+    </repository>
 </repositories>
-
-<dependency>
-    <groupId>com.github.coderFlameyosFlow</groupId>
-    <artifactId>WoodyMenus</artifactId>
-    <version>LATEST</version>
-</dependency>
 ```
-or gradle (kotlin) alternative:
-```kotlin
+
+or the gradle kotlin edition: (~~guess your code isn't that bad after all~~)
+```kt
 repositories {
-    maven("https://jitpack.io/")
+    maven("https://jitpack.io")
 }
 
 dependencies {
-    implementation("com.github.coderFlameyosFlow:WoodyMenus:LATEST")
+    implementation("com.github.coderFlameyosFlow.WoodyMenus:core:2.0.6")
 }
 ```
+> [!CAUTION]
+> Calling `HandlerList.unregisterAll()` or `HandlerList.unregisterAll(JavaPlugin)` will break the library, so use with caution!
 
-### CHANGE `LATEST` TO THE LATEST RELEASE.
-
-Example usage:
-```java
-import org.bukkit.plugin.java.JavaPlugin;
-
-import me.flame.menus.menu.*;
-
-public class MyPlugin extends JavaPlugin {
-    private final Menu menu;
-
-    @Override
-    public void onEnable() {
-        Menus.init(this);
-        menu = createExampleMenu();
-    }
-
-    ...
-
-    private Menu createExampleMenu() {
-        Menu exampleMenu = Menus.menu()
-              .title("&cExample Menu") // by default colorized
-              .rows(6) // if you go above 6 or under 1 you'll get an IllegalArgumentException
-              .create();
-        exampleMenu.setClickAction(event -> { // InventoryClickEvent
-            event.setCancelled(true); 
-        });
-
-        MenuItem item = ItemBuilder.of(Material.IRON_SWORD).buildItem(event -> {
-            getLogger().info("An Iron Sword got Clicked!");
-        }); // those args are optional you can execute .buildItem(), or even .build() if you want a normal ItemStack
-        exampleMenu.addItem(item);
-        exampleMenu.get(1) // Woody's indexes start from 0, this is #2, and yes this is an Optional<MenuItem>
-                   .filter(item -> item.getItemStack().getType() == Material.IRON_SWORD)
-                   .map(MenuItem::getUniqueId)
-                   .ifPresent(uuid -> getLogger().info(uuid.toString())); // man I love Optionals
-        // there is also exampleMenu.getItem(1) which is nullable so it's better if you use kotlin but worse if you use java (mostly)
-        return exampleMenu;
-    }
-}
-```
+You don't need to setup anything in your onEnable ~~(since 2.0.0)~~ or anything, just code right away!
+ 
+And now you can start writing good code and make your Family, Friends and Linus Torvalds proud!

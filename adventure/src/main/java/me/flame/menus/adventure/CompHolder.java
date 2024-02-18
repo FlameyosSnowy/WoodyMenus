@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 /**
  * Wrapper of an Adventure {@link Component}.
+ * @author stefvanschie at <a href="https://github.com/stefvanschie/IF">IF's github.</a>
  */
 @SuppressWarnings("unused")
 public abstract class CompHolder extends TextHolder {
@@ -74,18 +75,18 @@ public abstract class CompHolder extends TextHolder {
      * @return whether the server platform natively supports Adventure
      * @since 0.10.0
      */
-    private static boolean isNativeAdventureSupport() {
+    static boolean isNativeAdventureSupport() {
         return nativeAdventureSupport;
     }
 
     /**
      * Gets the serializer to use when converting wrapped values to legacy strings.
-     * Main use case being the implementation of {@link #asLegacyString()}.
+     * Main use case being the implementation of {@link #toString()}.
      *
      * @return a serializer for converting wrapped values to legacy strings
      * @since 0.10.0
      */
-    private static LegacyComponentSerializer legacySerializer() {
+    static LegacyComponentSerializer legacySerializer() {
         return legacySerializer;
     }
     

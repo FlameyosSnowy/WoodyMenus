@@ -88,19 +88,6 @@ public class ItemEditor {
         return this;
     }
 
-    /**
-     * Edits the name of the itemStack to whatever the provided title is.
-     * <p>
-     * Automatically colorized, so no need to try to colorize it again.
-     * @param title the new name of the title
-     * @return the builder for chaining
-     */
-    public ItemEditor name(TextHolder title, boolean colorize) {
-        if (this.hasNoItemMeta) return this;
-        title.asItemDisplayName(meta);
-        return this;
-    }
-
 
     /**
      * Edits the lore of the itemStack to whatever the provided lore is.
@@ -133,15 +120,8 @@ public class ItemEditor {
      * @param lore the new lore of the itemStack
      * @return the builder for chaining
      */
-    public ItemEditor setLore(List<String> lore) {
-        if (this.hasNoItemMeta) return this;
-        int loreSize = lore.size();
-        List<String> ogLore = new ArrayList<>(loreSize);
-        for (String string : lore) {
-            ogLore.add(translateAlternateColorCodes('&', string));
-        }
-        this.meta.setLore(ogLore);
-        return this;
+    public ItemEditor setLore(@NotNull List<String> lore) {
+        return this.setLore(lore.toArray(String[]::new));
     }
 
     /**
@@ -180,8 +160,7 @@ public class ItemEditor {
      */
     public ItemEditor setTextLore(TextHolder... lore) {
         if (this.hasNoItemMeta) return this;
-        int loreSize = lore.length;
-        List<TextHolder> ogLore = new ArrayList<>(loreSize);
+        List<TextHolder> ogLore = new ArrayList<>(lore.length);
         for (TextHolder string : lore) string.asItemLoreAtEnd(meta);
         return this;
     }
@@ -271,7 +250,7 @@ public class ItemEditor {
      * @deprecated Very bad way for async actions, use {@link MenuItem#setAsync(boolean)}
      */
     @Deprecated
-    @ApiStatus.ScheduledForRemoval(inVersion = "1.7.0")
+    @ApiStatus.ScheduledForRemoval(inVersion = "2.1.0")
     public ItemEditor setActionAsync(@NotNull ItemResponse event) {
         this.clickAction = CompletableFuture.supplyAsync(() -> event);
         return this;
