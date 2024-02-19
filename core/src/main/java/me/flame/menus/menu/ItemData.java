@@ -2,13 +2,12 @@ package me.flame.menus.menu;
 
 import com.google.common.collect.ImmutableSet;
 import me.flame.menus.items.MenuItem;
-
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.Buffer;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.ObjIntConsumer;
@@ -20,17 +19,13 @@ import java.util.function.Predicate;
  * Improves the DRY principle by allowing you to add items the same way in {@link Menu} and {@link PaginatedMenu} and others.
  * <p>
  * Contains MenuItem[] and the base menu
+ *
  * @since 2.0.0
  */
 @SuppressWarnings("UnusedReturnValue")
 public class ItemData {
-    public MenuItem[] getItems() {
-        return Arrays.copyOf(items, items.length);
-    }
-
-    private MenuItem[] items;
     final Menu menu;
-
+    private MenuItem[] items;
     public ItemData(@NotNull final Menu menu) {
         this.menu = menu;
         this.items = new MenuItem[menu.size];
@@ -41,6 +36,10 @@ public class ItemData {
         this.items = menu.items;
     }
 
+    public MenuItem[] getItems() {
+        return Arrays.copyOf(items, items.length);
+    }
+
     public boolean addItem(@NotNull final ItemStack... items) {
         final List<MenuItem> notAddedItems = new ArrayList<>(items.length);
 
@@ -48,11 +47,7 @@ public class ItemData {
         boolean changed = false;
         for (final ItemStack item : items) {
             MenuItem menuItem = MenuItem.of(item);
-            try {
-                if (this.add(slot, menuItem, notAddedItems)) return changed;
-            } catch (IndexOutOfBoundsException ignored) {
-                if (size(slot, menu.size, menu.rows, menuItem, notAddedItems)) return false;
-            }
+            if (this.add(slot, menuItem, notAddedItems)) return changed;
             changed = true;
             slot++;
         }
@@ -64,17 +59,17 @@ public class ItemData {
     private boolean add(int slot,
                         @NotNull final MenuItem guiItem,
                         @NotNull final List<MenuItem> notAddedItems) {
-        while (items[slot] != null) slot++;
-        if (size(slot, menu.size, menu.rows, guiItem, notAddedItems)) return true;
-
+        try {
+            while (items[slot] != null) slot++;
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+            return true;
+        }
+        if (slot > menu.size) { // if the slot is out of bounds
+            if (menu.rows == 6) return true;
+            notAddedItems.add(guiItem);
+            return false;
+        }
         items[slot] = guiItem;
-        return false;
-    }
-
-    private static boolean size(int slot, int size, int rows, MenuItem guiItem, List<MenuItem> notAddedItems) {
-        if (slot < size) return false;
-        if (rows == 6) return true;
-        notAddedItems.add(guiItem);
         return false;
     }
 
@@ -109,7 +104,7 @@ public class ItemData {
         items = Arrays.copyOf(items, menu.size);
     }
 
-   public void contents(MenuItem[] items) {
+    public void contents(MenuItem[] items) {
         this.items = items;
         menu.update();
     }
@@ -126,8 +121,8 @@ public class ItemData {
         return items[i];
     }
 
-    public MenuItem getItem(Slot position) {
-        return position.isValid() ? items[position.slot] : null;
+    public MenuItem getItem(Slot i) {
+        return i.isValid() ? items[i.slot] : null;
     }
 
     public void forEach(Consumer<? super MenuItem> action) {
@@ -178,7 +173,7 @@ public class ItemData {
         return items.length;
     }
 
-    public void removeItem(@NotNull Slot slot) {
+    public void removeItem(Slot slot) {
         if (slot.isValid()) removeItem(slot.slot);
     }
 
@@ -220,6 +215,8 @@ public class ItemData {
     }
 
     public void removeItem(ItemStack[] items) {
-        indexed((item, index) -> { if (items[index].equals(item.getItemStack())) removeItem(index); });
+        indexed((item, index) -> {
+            if (items[index].equals(item.getItemStack())) removeItem(index);
+        });
     }
 }
