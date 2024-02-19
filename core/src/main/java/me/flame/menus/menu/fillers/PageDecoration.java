@@ -27,35 +27,17 @@ public final class PageDecoration implements MenuFiller {
     }
 
     public void fillBorders(ItemStack itemStack) {
-        final MenuItem menuItem = MenuItem.of(itemStack);
-        
-        final int size = menu.size();
-        final int pages = menu.pages().size();
-        for (int pageIndex = 0; pageIndex < size; pageIndex++) {
-            final var page = menu.getPage(pageIndex);
-            for (int i = 0; i < size; i++) {
-                if (MenuFiller.isBorderSlot(i, size)) page.setItem(i, itemStack);
-            }
-        }
+        fillBorders(MenuItem.of(itemStack));
     }
 
     public void fillBorders(Material borderMaterial) {
-        final MenuItem menuItem = MenuItem.of(new ItemStack(borderMaterial));
-
-        final int size = menu.size();
-        final int pages = menu.pages().size();
-        for (int pageIndex = 0; pageIndex < size; pageIndex++) {
-            final var page = menu.getPage(pageIndex);
-            for (int i = 0; i < size; i++) {
-                if (MenuFiller.isBorderSlot(i, size)) page.setItem(i, menuItem);
-            }
-        }
+        fillBorders(MenuItem.of(new ItemStack(borderMaterial)));
     }
 
     public void fillBorders(MenuItem item) {
         final int size = menu.size();
         final int pages = menu.pages().size();
-        for (int pageIndex = 0; pageIndex < size; pageIndex++) {
+        for (int pageIndex = 0; pageIndex < pages; pageIndex++) {
             final var page = menu.getPage(pageIndex);
             for (int i = 0; i < size; i++) {
                 if (MenuFiller.isBorderSlot(i, size)) page.setItem(i, item);
@@ -64,16 +46,7 @@ public final class PageDecoration implements MenuFiller {
     }
 
     public void fill(Material borderMaterial) {
-        MenuItem menuItem = MenuItem.of(new ItemStack(borderMaterial));
-
-        final int size = menu.size();
-        final int pages = menu.pages().size();
-        for (int pageIndex = 0; pageIndex < size; pageIndex++) {
-            final var page = menu.getPage(pageIndex);
-            for (int i = 0; i < size; i++) {
-                if (!page.hasItem(i)) page.setItem(i, menuItem);
-            }
-        }
+        fill(MenuItem.of(new ItemStack(borderMaterial)));
     }
 
     public void fill(@NotNull MenuItem menuItem) {
@@ -88,39 +61,15 @@ public final class PageDecoration implements MenuFiller {
     }
 
     public void fill(ItemStack itemStack) {
-        MenuItem item = MenuItem.of(itemStack);
-        
-        final int size = menu.size();
-        final int pages = menu.pages().size();
-        for (int pageIndex = 0; pageIndex < size; pageIndex++) {
-            final var page = menu.getPage(pageIndex);
-            for (int i = 0; i < size; i++) {
-                if (!page.hasItem(i)) page.setItem(i, item);
-            }
-        }
+        fill(MenuItem.of(itemStack));
     }
 
-    public void fillRow(final int row, Material borderMaterial) {
-        if (row < 1 || row > 6) return;
-        final int sizedRow = row * 9, rowSize = sizedRow + 9;
-
-        MenuItem itemStack = MenuItem.of(new ItemStack(borderMaterial));
-        final int size = menu.size(), pages = menu.pages().size();
-        for (int pageIndex = 0; pageIndex < size; pageIndex++) {
-            final var page = menu.getPage(pageIndex);
-            for (int i = sizedRow; i < rowSize; i++) page.setItem(i, itemStack);
-        }
+    public void fillRow(final int row, Material material) {
+        fillRow(row, MenuItem.of(new ItemStack(material)));
     }
 
-    public void fillRow(final int row, ItemStack borderMaterial) {
-        MenuItem itemStack = MenuItem.of(borderMaterial);
-        if (row < 1 || row > 6) return;
-        final int sizedRow = row * 9, rowSize = sizedRow + 9;
-        final int size = menu.size(), pages = menu.pages().size();
-        for (int pageIndex = 0; pageIndex < size; pageIndex++) {
-            final var page = menu.getPage(pageIndex);
-            for (int i = sizedRow; i < rowSize; i++) page.setItem(i, itemStack);
-        }
+    public void fillRow(final int row, ItemStack itemStack) {
+        fillRow(row, MenuItem.of(itemStack));
     }
 
     public void fillRow(final int row, MenuItem itemStack) {
@@ -134,25 +83,11 @@ public final class PageDecoration implements MenuFiller {
     }
 
     public void fillArea(final int length, final int width, Material borderMaterial) {
-        MenuItem itemStack = MenuItem.of(new ItemStack(borderMaterial));
-        
-        final int size = menu.size(), pages = menu.pages().size();
-        for (int pageIndex = 0; pageIndex < size; pageIndex++) {
-            final var page = menu.getPage(pageIndex);
-            for (int i = 0; i < size; i++) if (MenuFiller.isInArea(i, length, width)) page.setItem(i, itemStack);
-
-        }
+        fillArea(length, width, MenuItem.of(new ItemStack(borderMaterial)));
     }
 
-    public void fillArea(final int length, final int width, ItemStack borderMaterial) {
-        MenuItem itemStack = MenuItem.of(borderMaterial);
-        
-        final int size = menu.size();
-        final int pages = menu.pages().size();
-        for (int pageIndex = 0; pageIndex < size; pageIndex++) {
-            final var page = menu.getPage(pageIndex);
-            for (int i = 0; i < size; i++) if (MenuFiller.isInArea(i, length, width)) page.setItem(i, itemStack);
-        }
+    public void fillArea(final int length, final int width, ItemStack itemStack) {
+        fillArea(length, width, MenuItem.of(itemStack));
     }
 
     public void fillArea(final int length, final int width, MenuItem itemStack) {
