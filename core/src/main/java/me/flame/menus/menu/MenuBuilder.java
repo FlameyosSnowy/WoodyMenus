@@ -168,8 +168,8 @@ public class MenuBuilder {
         checkRequirements(rows, title);
         checkPaginatedRequirements(pages, nextItemSlot, previousItemSlot, nextItem, previousItem);
         PaginatedMenu menu = type == MenuType.CHEST
-                ? PaginatedMenu.create(title, rows, pages, modifiers)
-                : PaginatedMenu.create(title, type, pages, modifiers);
+                ? PaginatedMenu.create(title, rows, pages, modifiers, previousItemSlot, nextItemSlot)
+                : PaginatedMenu.create(title, type, pages, modifiers, previousItemSlot, nextItemSlot);
 
         @NotNull List<ItemData> pages = menu.pages;
         if (nextItemSlot != -1 && nextItem != null) menu.setPageItem(nextItemSlot, nextItem);
