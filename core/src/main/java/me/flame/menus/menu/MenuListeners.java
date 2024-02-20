@@ -2,28 +2,22 @@ package me.flame.menus.menu;
 
 import lombok.AllArgsConstructor;
 import me.flame.menus.components.nbt.ItemNbt;
-import me.flame.menus.events.ClickActionEvent;
 import me.flame.menus.events.BeforeAnimatingEvent;
+import me.flame.menus.events.ClickActionEvent;
 import me.flame.menus.events.PageChangeEvent;
 import me.flame.menus.items.MenuItem;
-
 import me.flame.menus.menu.animation.Animation;
-
 import me.flame.menus.util.ItemResponse;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-
 import org.bukkit.event.inventory.*;
-
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
