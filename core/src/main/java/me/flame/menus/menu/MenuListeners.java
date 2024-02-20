@@ -2,28 +2,22 @@ package me.flame.menus.menu;
 
 import lombok.AllArgsConstructor;
 import me.flame.menus.components.nbt.ItemNbt;
-import me.flame.menus.events.ClickActionEvent;
 import me.flame.menus.events.BeforeAnimatingEvent;
+import me.flame.menus.events.ClickActionEvent;
 import me.flame.menus.events.PageChangeEvent;
 import me.flame.menus.items.MenuItem;
-
 import me.flame.menus.menu.animation.Animation;
-
 import me.flame.menus.util.ItemResponse;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-
 import org.bukkit.event.inventory.*;
-
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
@@ -91,8 +85,10 @@ public final class MenuListeners implements Listener {
             if (response != null) response.apply(slot, clicked);
         }
 
-        if (modifierDetected(menu, action, clickedInventory.getType(), inventory.getType()))
+        if (modifierDetected(menu, action, clickedInventory.getType(), inventory.getType())){
             clicked.setResult(Event.Result.DENY);
+            event.setCancelled(true);
+        }
         executeActions(clicked, view, menu, inventory, clickedInventory);
         executeItem(clicked, menu, current, (Player) event.getWhoClicked(), slot);
     }
@@ -213,10 +209,8 @@ public final class MenuListeners implements Listener {
     private static boolean handlePaginatedMenu(@NotNull PaginatedMenu menu, Player player, int slot) {
         boolean nextPage = slot == menu.getNextItemSlot(), previousPage = slot == menu.getPreviousItemSlot();
         if (!nextPage && !previousPage) return false;
-
         int newNumber = menu.getCurrentPageNumber(), oldNumber = newNumber - 1;
         ItemData oldPage = menu.getPage(oldNumber), currentPage = menu.data;
-
         // page has changed by now, execute page action
         PageChangeEvent event = new PageChangeEvent(menu, oldPage, currentPage, player, newNumber, oldNumber);
         menu.onPageChange.accept(event);
