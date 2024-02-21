@@ -3,7 +3,6 @@ package me.flame.menus.menu;
 import lombok.AllArgsConstructor;
 import me.flame.menus.components.nbt.ItemNbt;
 import me.flame.menus.events.BeforeAnimatingEvent;
-import me.flame.menus.events.ClickActionEvent;
 import me.flame.menus.events.PageChangeEvent;
 import me.flame.menus.items.MenuItem;
 import me.flame.menus.menu.animation.Animation;
@@ -72,23 +71,23 @@ public final class MenuListeners implements Listener {
         ClickType click = event.getClick();
         InventoryAction action = event.getAction();
         ItemStack current = event.getCurrentItem();
-        ClickActionEvent clicked = new ClickActionEvent(view, type, raw, slot, click, current, action);
+        //ClickActionEvent clicked = new ClickActionEvent(view, type, raw, slot, click, current, action);
 
         Menu menu = ((Menu) holder);
         if (clickedInventory == null) {
-            menu.outsideClickAction.accept(clicked);
+            menu.outsideClickAction.accept(event);
             return;
         }
 
         if (menu.hasSlotActions()) {
             ItemResponse response = menu.slotActions[slot];
-            if (response != null) response.apply(slot, clicked);
+            if (response != null) response.apply((Player) event.getWhoClicked(), event);
         }
 
         if (modifierDetected(menu, action, clickedInventory.getType(), inventory.getType()))
             event.setResult(Event.Result.DENY);
-        executeActions(clicked, view, menu, inventory, clickedInventory);
-        executeItem(clicked, menu, current, (Player) event.getWhoClicked(), slot);
+        executeActions(event, view, menu, inventory, clickedInventory);
+        executeItem(event, menu, current, (Player) event.getWhoClicked(), slot);
     }
 
     @EventHandler
@@ -176,7 +175,7 @@ public final class MenuListeners implements Listener {
         return false;
     }
 
-    private static void executeActions(ClickActionEvent event,
+    private static void executeActions(InventoryClickEvent event,
                                        InventoryView view,
                                        Menu menu,
                                        @NotNull Inventory inventory,
@@ -189,7 +188,7 @@ public final class MenuListeners implements Listener {
         menu.clickAction.accept(event);
     }
 
-    private static void executeItem(ClickActionEvent actionEvent, Menu menu, ItemStack it, Player player, int slot) {
+    private static void executeItem(InventoryClickEvent actionEvent, Menu menu, ItemStack it, Player player, int slot) {
         MenuItem menuItem;
         if (it == null || (menuItem = menu.getItem(slot)) == null) return;
 
@@ -197,8 +196,8 @@ public final class MenuListeners implements Listener {
         if (nbt == null || !nbt.equals(menuItem.getUniqueId().toString())) return;
 
         if (menuItem.isOnCooldown(player)) return;
-        CompletableFuture<ActionResponse> response = menuItem.click(slot, actionEvent);
-        response.thenAccept(e -> handleRetry(slot, menuItem, actionEvent, e));
+        CompletableFuture<ActionResponse> response = menuItem.click(player, actionEvent);
+        response.thenAccept(e -> handleRetry(player, menuItem, actionEvent, e));
 
         if (menu instanceof PaginatedMenu) handlePaginatedMenu((PaginatedMenu) menu, player, slot);
     }
@@ -217,12 +216,12 @@ public final class MenuListeners implements Listener {
         return !event.isCancelled() || menu.page(oldNumber);
     }
 
-    private static CompletableFuture<ActionResponse> handleRetry(int num, MenuItem menuItem, ClickActionEvent actionEvent, @NotNull ActionResponse response) {
+    private static CompletableFuture<ActionResponse> handleRetry(Player player, MenuItem menuItem, InventoryClickEvent actionEvent, @NotNull ActionResponse response) {
         if (response.isRetry()) {
-            CompletableFuture<ActionResponse> clicked = menuItem.click(num, actionEvent);
+            CompletableFuture<ActionResponse> clicked = menuItem.click(player, actionEvent);
             return menuItem.isAsync()
-                    ? clicked.thenComposeAsync(e -> handleRetry(num, menuItem, actionEvent, response))
-                    : clicked.thenCompose(e -> handleRetry(num, menuItem, actionEvent, response));
+                    ? clicked.thenComposeAsync(e -> handleRetry(player, menuItem, actionEvent, response))
+                    : clicked.thenCompose(e -> handleRetry(player, menuItem, actionEvent, response));
         }
         return CompletableFuture.completedFuture(response);
     }

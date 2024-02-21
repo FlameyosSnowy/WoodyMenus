@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import me.flame.menus.components.nbt.ItemNbt;
-import me.flame.menus.events.ClickActionEvent;
 import me.flame.menus.items.states.State;
 import me.flame.menus.menu.ActionResponse;
 import me.flame.menus.util.ItemResponse;
@@ -15,6 +14,7 @@ import org.bukkit.Nameable;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import org.bukkit.inventory.meta.ItemMeta;
@@ -147,10 +147,10 @@ public final class MenuItem implements Nameable, Cloneable, Serializable, Compar
         }
     }
 
-    public CompletableFuture<ActionResponse> click(final int slot, final ClickActionEvent event) {
+    public CompletableFuture<ActionResponse> click(final Player player, final InventoryClickEvent event) {
         return async
-                ? clickAction.thenApplyAsync(ca -> ca.apply(slot, event))
-                : clickAction.thenApply(ca -> ca.apply(slot, event));
+                ? clickAction.thenApplyAsync(ca -> ca.apply(player, event))
+                : clickAction.thenApply(ca -> ca.apply(player, event));
     }
 
     @Override

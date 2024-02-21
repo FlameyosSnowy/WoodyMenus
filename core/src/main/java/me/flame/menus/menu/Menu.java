@@ -10,7 +10,6 @@ import lombok.Setter;
 
 import me.flame.menus.adventure.TextHolder;
 import me.flame.menus.components.nbt.*;
-import me.flame.menus.events.ClickActionEvent;
 import me.flame.menus.events.BeforeAnimatingEvent;
 import me.flame.menus.items.MenuItem;
 import me.flame.menus.menu.animation.Animation;
@@ -23,6 +22,7 @@ import me.flame.menus.util.VersionHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -91,7 +91,7 @@ public class Menu implements IMenu, RandomAccess, Serializable {
         Bukkit.getPluginManager().registerEvents(new MenuListeners(plugin), plugin);
     }
 
-    @Setter Consumer<ClickActionEvent> outsideClickAction = event -> {}, bottomClickAction = event -> {}, topClickAction = event -> {}, clickAction = event -> {};
+    @Setter Consumer<InventoryClickEvent> outsideClickAction = event -> {}, bottomClickAction = event -> {}, topClickAction = event -> {}, clickAction = event -> {};
     @Setter BiConsumer<InventoryCloseEvent, Result> closeAction = (event, result) -> {};
     @Setter Consumer<InventoryOpenEvent> openAction = event -> {};
     @Setter Consumer<InventoryDragEvent> dragAction = event -> {};
