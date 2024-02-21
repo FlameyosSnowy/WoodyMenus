@@ -92,7 +92,7 @@ public final class MenuListeners implements Listener {
         }
 
         if (modifierDetected(menu, action, clickedInventory.getType(), inventory.getType()))
-            clicked.setResult(Event.Result.DENY);
+            event.setResult(Event.Result.DENY);
         executeActions(clicked, view, menu, inventory, clickedInventory);
         executeItem(clicked, menu, current, (Player) event.getWhoClicked(), slot);
     }
