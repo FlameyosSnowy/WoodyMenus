@@ -206,7 +206,7 @@ public final class MenuListeners implements Listener {
     @SuppressWarnings("UnusedReturnValue")
     private static boolean handlePaginatedMenu(@NotNull PaginatedMenu menu, Player player, int slot) {
         if (slot != menu.getNextItemSlot() && slot != menu.getPreviousItemSlot()) return false;
-        int newNumber = menu.getCurrentPageNumber() - 1, oldNumber = newNumber - 1;
+        int newNumber = menu.getPageNumber() + (menu.getNextItemSlot() == slot ? 1 : -1), oldNumber = menu.getPageNumber();
         ItemData oldPage = menu.getPage(oldNumber), currentPage = menu.data;
 
         // page has changed by now, execute page action
@@ -214,7 +214,7 @@ public final class MenuListeners implements Listener {
         menu.onPageChange.accept(event);
 
         // if cancelled go back to the page it was on.
-        return (event.isCancelled()) ? menu.page(oldNumber) : true;
+        return !event.isCancelled() || menu.page(oldNumber);
     }
 
     private static CompletableFuture<ActionResponse> handleRetry(int num, MenuItem menuItem, ClickActionEvent actionEvent, @NotNull ActionResponse response) {
