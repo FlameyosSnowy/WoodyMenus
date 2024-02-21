@@ -66,6 +66,17 @@ public final class PaginatedMenu extends Menu implements Pagination {
         this.data = pages.get(pageNumber);
     }
 
+    private PaginatedMenu(final int pageRows, final int pageCount, TextHolder title, EnumSet<Modifier> modifiers, int nextItemSlot, int previousItemSlot) {
+        super(pageRows, title, modifiers, true);
+        this.pages = new ArrayList<>(pageCount);
+
+        for (int pageIndex = 0; pageIndex < pageCount; pageIndex++)
+            pages.add(new ItemData(this));
+        this.data = pages.get(pageNumber);
+        this.previousItemSlot = previousItemSlot;
+        this.nextItemSlot = nextItemSlot;
+    }
+
     /**
      * Main constructor to provide a way to create PaginatedMenu
      */
@@ -76,6 +87,17 @@ public final class PaginatedMenu extends Menu implements Pagination {
         for (int pageIndex = 0; pageIndex < pageCount; pageIndex++)
             pages.add(new ItemData(this));
         this.data = pages.get(pageNumber);
+    }
+
+    private PaginatedMenu(MenuType type, final int pageCount, TextHolder title, EnumSet<Modifier> modifiers, int nextItemSlot, int previousItemSlot) {
+        super(type, title, modifiers, true);
+        this.pages = new ArrayList<>(pageCount);
+
+        for (int pageIndex = 0; pageIndex < pageCount; pageIndex++)
+            pages.add(new ItemData(this));
+        this.data = pages.get(pageNumber);
+        this.previousItemSlot = previousItemSlot;
+        this.nextItemSlot = nextItemSlot;
     }
 
     public ImmutableList<ItemData> pages() { return ImmutableList.copyOf(pages); }
@@ -96,8 +118,18 @@ public final class PaginatedMenu extends Menu implements Pagination {
     }
 
     @NotNull
+    public static PaginatedMenu create(TextHolder title, int rows, int pages, EnumSet<Modifier> modifiers, int previousItemSlot, int nextItemSlot) {
+        return new PaginatedMenu(rows, pages, title, modifiers, nextItemSlot, previousItemSlot);
+    }
+
+    @NotNull
     public static PaginatedMenu create(String title, MenuType type, int pages, EnumSet<Modifier> modifiers) {
         return new PaginatedMenu(type, pages, TextHolder.of(title), modifiers);
+    }
+
+    @NotNull
+    public static PaginatedMenu create(TextHolder title, MenuType type, int pages, EnumSet<Modifier> modifiers, int previousItemSlot, int nextItemSlot) {
+        return new PaginatedMenu(type, pages, title, modifiers, nextItemSlot, previousItemSlot);
     }
 
     @NotNull
@@ -369,8 +401,17 @@ public final class PaginatedMenu extends Menu implements Pagination {
         for (ItemData page : pages) setPageItem0(page, size, slots, items);
     }
 
+    public void setPageItem(int[] slots, MenuItem item) {
+        int size = slots.length;
+        for (ItemData page : pages) setPageItem0(page, size, slots, item);
+    }
+
     private static void setPageItem0(ItemData page, int size, int[] slots, MenuItem[] items) {
         for (int i = 0; i < size; i++) page.setItem(slots[i], items[i]);
+    }
+
+    private static void setPageItem0(ItemData page, int size, int[] slots, MenuItem item) {
+        for (int i = 0; i < size; i++) page.setItem(slots[i], item);
     }
 
     @Override
