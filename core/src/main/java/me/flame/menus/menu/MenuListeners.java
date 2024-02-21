@@ -2,28 +2,22 @@ package me.flame.menus.menu;
 
 import lombok.AllArgsConstructor;
 import me.flame.menus.components.nbt.ItemNbt;
-import me.flame.menus.events.ClickActionEvent;
 import me.flame.menus.events.BeforeAnimatingEvent;
+import me.flame.menus.events.ClickActionEvent;
 import me.flame.menus.events.PageChangeEvent;
 import me.flame.menus.items.MenuItem;
-
 import me.flame.menus.menu.animation.Animation;
-
 import me.flame.menus.util.ItemResponse;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-
 import org.bukkit.event.inventory.*;
-
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
@@ -212,10 +206,8 @@ public final class MenuListeners implements Listener {
     @SuppressWarnings("UnusedReturnValue")
     private static boolean handlePaginatedMenu(@NotNull PaginatedMenu menu, Player player, int slot) {
         if (slot != menu.getNextItemSlot() && slot != menu.getPreviousItemSlot()) return false;
-
         int newNumber = menu.getCurrentPageNumber() - 1, oldNumber = newNumber - 1;
         ItemData oldPage = menu.getPage(oldNumber), currentPage = menu.data;
-
         // page has changed by now, execute page action
         PageChangeEvent event = new PageChangeEvent(menu, oldPage, currentPage, player, newNumber, oldNumber);
         menu.onPageChange.accept(event);
