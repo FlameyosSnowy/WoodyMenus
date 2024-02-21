@@ -278,6 +278,7 @@ public class Menu implements IMenu, RandomAccess, Serializable {
         this.updating = true;
         updatePlayerInventories(inventory, player -> ((Player) player).updateInventory());
         this.updating = false;
+        this.changed = false;
     }
 
     public void updatePer(long repeatTime) {
