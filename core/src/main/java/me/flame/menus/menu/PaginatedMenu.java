@@ -32,6 +32,7 @@ public final class PaginatedMenu extends Menu implements Pagination {
     @NotNull
     final List<ItemData> pages;
 
+    @Getter
     private int pageNumber;
 
     private @Getter int nextItemSlot = -1, previousItemSlot = -1;
@@ -269,7 +270,7 @@ public final class PaginatedMenu extends Menu implements Pagination {
     }
 
     /**
-     * Gets the current page number
+     * Gets the current page number (Inflated by 1)
      *
      * @return The current page number
      */
@@ -301,7 +302,7 @@ public final class PaginatedMenu extends Menu implements Pagination {
 
         pageNumber++;
         this.data = pages.get(pageNumber);
-
+        super.changed = true;
         update();
         return true;
     }
@@ -318,6 +319,7 @@ public final class PaginatedMenu extends Menu implements Pagination {
         pageNumber--;
         this.data = pages.get(pageNumber);
 
+        super.changed = true;
         update();
         return true;
     }
