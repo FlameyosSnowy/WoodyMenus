@@ -206,7 +206,6 @@ public final class MenuListeners implements Listener {
     @SuppressWarnings("UnusedReturnValue")
     private static boolean handlePaginatedMenu(@NotNull PaginatedMenu menu, Player player, int slot) {
         if (slot != menu.getNextItemSlot() && slot != menu.getPreviousItemSlot()) return false;
-
         int newNumber = menu.getCurrentPageNumber() - 1, oldNumber = newNumber - 1;
         ItemData oldPage = menu.getPage(oldNumber), currentPage = menu.data;
 
