@@ -81,7 +81,7 @@ public final class MenuListeners implements Listener {
 
         if (menu.hasSlotActions()) {
             ItemResponse response = menu.slotActions[slot];
-            if (response != null) response.apply((Player) event.getWhoClicked(), event);
+            if (response != null) response.execute((Player) event.getWhoClicked(), event);
         }
 
         if (modifierDetected(menu, action, clickedInventory.getType(), inventory.getType()))

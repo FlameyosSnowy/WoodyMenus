@@ -7,6 +7,7 @@ import me.flame.menus.components.nbt.ItemNbt;
 import me.flame.menus.items.states.State;
 import me.flame.menus.util.ItemResponse;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Nameable;
@@ -71,7 +72,7 @@ public final class MenuItem implements Nameable, Cloneable, Serializable, Compar
         this.uuid =  UUID.randomUUID();
         this.itemStack = ItemNbt.setString(itemStack, "woody-menu", uuid.toString());
 
-        this.clickAction = CompletableFuture.completedFuture(action == null ? (slot, event) -> null : action);
+        this.clickAction = CompletableFuture.completedFuture(action == null ? (slot, event) -> {} : action);
     }
 
     private MenuItem(ItemStack itemStack, @Nullable ItemResponse action, @NotNull UUID uuid) {
@@ -79,7 +80,7 @@ public final class MenuItem implements Nameable, Cloneable, Serializable, Compar
         this.uuid =  UUID.randomUUID();
         this.itemStack = ItemNbt.setString(itemStack, "woody-menu", uuid.toString());
 
-        this.clickAction = CompletableFuture.completedFuture(action == null ? (slot, event) -> null : action);
+        this.clickAction = CompletableFuture.completedFuture(action == null ? (slot, event) -> {} : action);
     }
 
     public static @NotNull MenuItem of(ItemStack itemStack, @Nullable ItemResponse action) {
@@ -148,8 +149,8 @@ public final class MenuItem implements Nameable, Cloneable, Serializable, Compar
 
     public CompletableFuture<Void> click(final Player player, final InventoryClickEvent event) {
         return async
-                ? clickAction.thenAcceptAsync(ca -> ca.apply(player, event))
-                : clickAction.thenAccept(ca -> ca.apply(player, event));
+                ? clickAction.thenAcceptAsync(ca -> ca.execute(player, event))
+                : clickAction.thenAccept(ca -> ca.execute(player, event));
     }
 
     @Override
