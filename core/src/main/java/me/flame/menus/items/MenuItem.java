@@ -72,7 +72,7 @@ public final class MenuItem implements Nameable, Cloneable, Serializable, Compar
         this.uuid =  UUID.randomUUID();
         this.itemStack = ItemNbt.setString(itemStack, "woody-menu", uuid.toString());
 
-        this.clickAction = CompletableFuture.completedFuture(action == null ? (slot, event) -> ActionResponse.EMPTY : action);
+        this.clickAction = CompletableFuture.completedFuture(action == null ? (slot, event) -> {} : action);
     }
 
     private MenuItem(ItemStack itemStack, @Nullable ItemResponse action, @NotNull UUID uuid) {
@@ -80,7 +80,7 @@ public final class MenuItem implements Nameable, Cloneable, Serializable, Compar
         this.uuid =  UUID.randomUUID();
         this.itemStack = ItemNbt.setString(itemStack, "woody-menu", uuid.toString());
 
-        this.clickAction = CompletableFuture.completedFuture(action == null ? (slot, event) -> ActionResponse.DONE : action);
+        this.clickAction = CompletableFuture.completedFuture(action == null ? (slot, event) -> {} : action);
     }
 
     public static @NotNull MenuItem of(ItemStack itemStack, @Nullable ItemResponse action) {
@@ -147,10 +147,10 @@ public final class MenuItem implements Nameable, Cloneable, Serializable, Compar
         }
     }
 
-    public CompletableFuture<ActionResponse> click(final int slot, final ClickActionEvent event) {
+    public CompletableFuture<Void> click(final Player player, final InventoryClickEvent event) {
         return async
-                ? clickAction.thenApplyAsync(ca -> ca.apply(slot, event))
-                : clickAction.thenApply(ca -> ca.apply(slot, event));
+                ? clickAction.thenApplyAsync(ca -> ca.apply(player, event))
+                : clickAction.thenApply(ca -> ca.apply(player, event));
     }
 
     @Override
