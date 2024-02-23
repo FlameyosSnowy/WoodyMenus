@@ -38,9 +38,10 @@ public final class MenuIterator implements Iterator<MenuItem> {
                         @NotNull IterationDirection direction,
                         @NotNull IMenu menu) {
         int prepos = getSlotFromRowCol(startingRow, startingCol);
-        if (prepos < 0 || prepos >= menu.size()) throw new IllegalArgumentException(GREATER_THAN_ONE_ONLY);
+        
         this.menu = menu;
-        this.size = menu.size();
+        this.size = menu.size();        
+        if (prepos < 0 || prepos >= size) throw new IllegalArgumentException(GREATER_THAN_ONE_ONLY);
         this.next = prepos;
         this.position = prepos;
         this.direction = direction;
