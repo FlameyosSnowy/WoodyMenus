@@ -196,9 +196,7 @@ public final class MenuListeners implements Listener {
         if (nbt == null || !nbt.equals(menuItem.getUniqueId().toString())) return;
 
         if (menuItem.isOnCooldown(player)) return;
-        CompletableFuture<ActionResponse> response = menuItem.click(player, actionEvent);
-        response.thenAccept(e -> handleRetry(player, menuItem, actionEvent, e));
-
+        menuItem.click(slot, actionEvent);
         if (menu instanceof PaginatedMenu) handlePaginatedMenu((PaginatedMenu) menu, player, slot);
     }
 
@@ -216,24 +214,10 @@ public final class MenuListeners implements Listener {
         return !event.isCancelled() || menu.page(oldNumber);
     }
 
-    private static CompletableFuture<ActionResponse> handleRetry(Player player, MenuItem menuItem, InventoryClickEvent actionEvent, @NotNull ActionResponse response) {
-        if (response.isRetry()) {
-            CompletableFuture<ActionResponse> clicked = menuItem.click(player, actionEvent);
-            return menuItem.isAsync()
-                    ? clicked.thenComposeAsync(e -> handleRetry(player, menuItem, actionEvent, response))
-                    : clicked.thenCompose(e -> handleRetry(player, menuItem, actionEvent, response));
-        }
-        return CompletableFuture.completedFuture(response);
-    }
-
     private static boolean modifierDetected(@NotNull IMenu menu, InventoryAction action, InventoryType ciType, InventoryType invType) {
-        if (menu.allModifiersAdded()) return true;
-
-        boolean irremovable;
-        return ((!menu.areItemsPlaceable() && isPlaceItemEvent(action, ciType, invType)) ||
-                ((irremovable = !menu.areItemsRemovable()) && isTakeItemEvent(action, ciType, invType)) ||
+        return (menu.allModifiersAdded()) || ((!menu.areItemsPlaceable() && isPlaceItemEvent(action, ciType, invType)) ||
+                (menu.areItemsRemovable() && (isTakeItemEvent(action, ciType, invType) || isDropItemEvent(action, invType))) ||
                 (!menu.areItemsSwappable() && isSwapItemEvent(action, ciType, invType)) ||
-                (irremovable && isDropItemEvent(action, invType)) ||
                 (!menu.areItemsCloneable() && isOtherEvent(action, invType)));
     }
 }

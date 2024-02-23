@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import me.flame.menus.components.nbt.ItemNbt;
+import me.flame.menus.events.ClickActionEvent;
 import me.flame.menus.items.states.State;
-import me.flame.menus.menu.ActionResponse;
 import me.flame.menus.util.ItemResponse;
 
 import org.bukkit.ChatColor;
@@ -14,7 +14,6 @@ import org.bukkit.Nameable;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import org.bukkit.inventory.meta.ItemMeta;
@@ -72,7 +71,7 @@ public final class MenuItem implements Nameable, Cloneable, Serializable, Compar
         this.uuid =  UUID.randomUUID();
         this.itemStack = ItemNbt.setString(itemStack, "woody-menu", uuid.toString());
 
-        this.clickAction = CompletableFuture.completedFuture(action == null ? (slot, event) -> ActionResponse.EMPTY : action);
+        this.clickAction = CompletableFuture.completedFuture(action == null ? (slot, event) -> {} : action);
     }
 
     private MenuItem(ItemStack itemStack, @Nullable ItemResponse action, @NotNull UUID uuid) {
@@ -80,7 +79,7 @@ public final class MenuItem implements Nameable, Cloneable, Serializable, Compar
         this.uuid =  UUID.randomUUID();
         this.itemStack = ItemNbt.setString(itemStack, "woody-menu", uuid.toString());
 
-        this.clickAction = CompletableFuture.completedFuture(action == null ? (slot, event) -> ActionResponse.DONE : action);
+        this.clickAction = CompletableFuture.completedFuture(action == null ? (slot, event) -> {} : action);
     }
 
     public static @NotNull MenuItem of(ItemStack itemStack, @Nullable ItemResponse action) {
@@ -147,7 +146,7 @@ public final class MenuItem implements Nameable, Cloneable, Serializable, Compar
         }
     }
 
-    public CompletableFuture<ActionResponse> click(final Player player, final InventoryClickEvent event) {
+    public CompletableFuture<Void> click(final Player player, final InventoryClickEvent event) {
         return async
                 ? clickAction.thenApplyAsync(ca -> ca.apply(player, event))
                 : clickAction.thenApply(ca -> ca.apply(player, event));
