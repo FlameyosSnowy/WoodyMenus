@@ -121,7 +121,8 @@ public class ItemEditor {
      * @return the builder for chaining
      */
     public ItemEditor setLore(@NotNull List<String> lore) {
-        return this.setLore(lore.toArray(String[]::new));
+        meta.setLore(lore);
+        return this;
     }
 
     /**
