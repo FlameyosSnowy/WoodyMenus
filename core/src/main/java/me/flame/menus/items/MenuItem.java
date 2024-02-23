@@ -6,7 +6,6 @@ import lombok.Setter;
 import me.flame.menus.components.nbt.ItemNbt;
 import me.flame.menus.events.ClickActionEvent;
 import me.flame.menus.items.states.State;
-import me.flame.menus.menu.ActionResponse;
 import me.flame.menus.util.ItemResponse;
 
 import org.bukkit.ChatColor;
