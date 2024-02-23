@@ -147,7 +147,9 @@ public final class MenuItem implements Nameable, Cloneable, Serializable, Compar
     }
 
     public CompletableFuture<Void> click(final Player player, final InventoryClickEvent event) {
-        return async ? clickAction.thenApplyAsync(null) : clickAction.thenApply(null);
+        return async
+                ? clickAction.thenAcceptAsync(ca -> ca.apply(player, event))
+                : clickAction.thenAccept(ca -> ca.apply(player, event));
     }
 
     @Override
