@@ -37,10 +37,6 @@ public interface Pagination {
 
     void addPageItems(ItemStack... items);
 
-    void setPageItem(Slot slot, MenuItem item);
-
-    void removePageItem(Slot slot);
-
     void removePageItem(int slot);
 
     void removePageItem(ItemStack slot);
@@ -54,12 +50,6 @@ public interface Pagination {
     void setPageItem(int[] slots, MenuItem[] items);
 
     void setPageItem(int slot, ItemStack item);
-
-    void setPageItem(Slot slot, ItemStack item);
-    
-    void setPageItem(Slot[] slots, ItemStack... items);
-
-    void setPageItem(Slot[] slots, ItemStack item);
 
     /**
      * Gets the current page number

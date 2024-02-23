@@ -6,7 +6,6 @@ import me.flame.menus.items.MenuItem;
 import me.flame.menus.menu.ItemData;
 import me.flame.menus.menu.Menu;
 
-import me.flame.menus.menu.Slot;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -70,12 +69,6 @@ public class Frame {
 
         @NotNull
         public Builder setItem(int slot, MenuItem item) {
-            this.data.setItem(slot, item);
-            return this;
-        }
-
-        @NotNull
-        public Builder setItem(Slot slot, MenuItem item) {
             this.data.setItem(slot, item);
             return this;
         }

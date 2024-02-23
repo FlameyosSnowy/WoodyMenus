@@ -19,7 +19,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 @SuppressWarnings({"unused", "UnusedReturnValue"})
-public interface IMenu extends Iterable<MenuItem>, InventoryHolder {
+public interface IMenu extends InventoryHolder {
     /**
      * Get a map of the items in the menu.
      * <p>This is an unmodifiable map.</p>
@@ -28,27 +28,6 @@ public interface IMenu extends Iterable<MenuItem>, InventoryHolder {
      * @return the item map.
      */
     @Unmodifiable Map<Integer, MenuItem> getItemMap();
-
-    /**
-     * Get a LIST iterator of the items in the menu
-     * @return the list iterator
-     */
-    @NotNull
-    Iterator<MenuItem> iterator();
-
-    /**
-     * Get a LIST iterator of the items in the menu
-     * @param direction the direction of the iteration
-     * @return the list iterator
-     */
-    Iterator<MenuItem> iterator(IterationDirection direction);
-
-    /**
-     * Get a LIST iterator of the items in the menu
-     * @param direction the direction of the iteration
-     * @return the list iterator
-     */
-    Iterator<MenuItem> iterator(int startingRow, int startingCol, IterationDirection direction);
 
     /**
      * Get a stream loop of the items in the menu
@@ -91,20 +70,6 @@ public interface IMenu extends Iterable<MenuItem>, InventoryHolder {
      * As this is the itemStack to add, it's not a menu itemStack, so it'd be converted to a MenuItem first
      * @param item the itemStack to add
      */
-    void setItem(@NotNull Slot slot, ItemStack item);
-
-    /**
-     * Add the itemStack to the list of items in the menu.
-     * @param item the itemStack to add
-     */
-    void setItem(@NotNull Slot slot, MenuItem item);
-
-    /**
-     * Add the itemStack to the list of items in the menu.
-     * <p>
-     * As this is the itemStack to add, it's not a menu itemStack, so it'd be converted to a MenuItem first
-     * @param item the itemStack to add
-     */
     void setItem(int slot, ItemStack item);
     
     /**
@@ -131,25 +96,6 @@ public interface IMenu extends Iterable<MenuItem>, InventoryHolder {
      */
     Optional<MenuItem> get(int i);
 
-    /**
-     * get the itemStack from the list of items in the menu.
-     * @param slot the slot (row and col) of the itemStack
-     * @return the itemStack or null
-     */
-    @Nullable MenuItem getItem(@NotNull Slot slot);
-
-    /**
-     * get the itemStack from the list of items in the menu.
-     * <p></p>
-     * Usually this is the recommended way when using Java.
-     * <p></p>
-     * It is wrapped in an Optional which may or may not make the code cleaner and safer.
-     * @param slot the index of the itemStack
-     * @return the optional itemStack or an empty optional
-     */
-    Optional<MenuItem> get(@NotNull Slot slot);
-    
-    boolean hasItem(@NotNull Slot slot);
 
     /**
      * Checks if the given slot has an item.
@@ -326,14 +272,6 @@ public interface IMenu extends Iterable<MenuItem>, InventoryHolder {
      * @param itemStack the item stack to update the menuItem with
      */
     void updateItem(final int slot, @NotNull final ItemStack itemStack);
-
-    /**
-     * Alternative {@link #updateItem(int, ItemStack)} that takes a {@link Slot} instead of int slots.
-     *
-     * @param slot      The row and col of the slot.
-     * @param itemStack The {@link ItemStack} to replace in the original one in the {@link MenuItem}.
-     */
-    void updateItem(@NotNull Slot slot, @NotNull final ItemStack itemStack);
 
     /**
      * Clear every item in the menu.

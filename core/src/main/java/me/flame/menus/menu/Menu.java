@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 
 import me.flame.menus.adventure.TextHolder;
@@ -14,7 +13,6 @@ import me.flame.menus.events.BeforeAnimatingEvent;
 import me.flame.menus.items.MenuItem;
 import me.flame.menus.menu.animation.Animation;
 import me.flame.menus.menu.fillers.*;
-import me.flame.menus.menu.iterator.MenuIterator;
 import me.flame.menus.modifiers.Modifier;
 import me.flame.menus.util.ItemResponse;
 import me.flame.menus.util.VersionHelper;
@@ -132,15 +130,6 @@ public class Menu implements IMenu, RandomAccess, Serializable {
 
     public <T extends MenuFiller> T getFiller(@NotNull Class<T> value) { return value.cast(defaultFiller); }
 
-    @NotNull
-    public MenuIterator iterator() { return new MenuIterator(IterationDirection.HORIZONTAL, this); }
-
-    public MenuIterator iterator(IterationDirection direction) {return new MenuIterator(direction, this); }
-
-    public MenuIterator iterator(int startingRow, int startingCol, IterationDirection direction) {
-        return new MenuIterator(startingRow, startingCol, direction, this);
-    }
-
     public Stream<MenuItem> stream() { return Arrays.stream(data.getItems()); }
 
     public Stream<MenuItem> parallelStream() { return stream().parallel(); }
@@ -161,16 +150,6 @@ public class Menu implements IMenu, RandomAccess, Serializable {
         return (changed = addItem(items.toArray(new MenuItem[0])));
     }
 
-    public void setItem(@NonNull Slot position, ItemStack item) {
-        this.data.setItem(position, MenuItem.of(item));
-        changed = true;
-    }
-
-    public void setItem(@NonNull Slot position, MenuItem item) {
-        this.data.setItem(position, item);
-        changed = true;
-    }
-
     public void setItem(int slot, ItemStack item) {
         this.data.setItem(slot, MenuItem.of(item));
         changed = true;
@@ -187,18 +166,6 @@ public class Menu implements IMenu, RandomAccess, Serializable {
 
     public Optional<MenuItem> get(int i) {
         return Optional.ofNullable(getItem(i));
-    }
-
-    public @Nullable MenuItem getItem(@NonNull Slot position) {
-        return data.getItem(position);
-    }
-
-    public Optional<MenuItem> get(@NonNull Slot position) {
-        return Optional.ofNullable(getItem(position));
-    }
-
-    public boolean hasItem(@NonNull Slot position) {
-        return position.isValid() && hasItem(position.slot);
     }
 
     public boolean hasItem(int slot) {
@@ -220,13 +187,6 @@ public class Menu implements IMenu, RandomAccess, Serializable {
     public void setSlotAction(int slot, ItemResponse response) {
         ItemResponse[] slotActions = getSlotActions();
         slotActions[slot] = response;
-    }
-
-    public void setSlotAction(@NotNull Slot position, ItemResponse response) {
-        if (position.isValid()) {
-            ItemResponse[] slotActions = getSlotActions();
-            slotActions[position.slot] = response;
-        }
     }
 
     public @Nullable MenuItem getItem(Predicate<MenuItem> itemDescription) {
@@ -260,14 +220,6 @@ public class Menu implements IMenu, RandomAccess, Serializable {
     @CanIgnoreReturnValue
     public MenuItem removeItem(int index) {
         MenuItem item = this.data.removeItem(index);
-        if (item != null) changed = true;
-        return item;
-    }
-
-    @Contract("_ -> new")
-    @CanIgnoreReturnValue
-    public MenuItem removeItem(@NotNull Slot position) {
-        MenuItem item = (position.isValid()) ? this.data.removeItem(position.slot) : null;
         if (item != null) changed = true;
         return item;
     }
@@ -350,10 +302,6 @@ public class Menu implements IMenu, RandomAccess, Serializable {
 
     public void updateItem(final int slot, @NotNull final ItemStack itemStack) {
         data.updateItem(slot, itemStack, this.data.getItem(slot));
-    }
-
-    public void updateItem(@NotNull Slot position, @NotNull final ItemStack itemStack) {
-        if (position.isValid()) updateItem(position.slot, itemStack);
     }
 
     public void setContents(MenuItem... items) {

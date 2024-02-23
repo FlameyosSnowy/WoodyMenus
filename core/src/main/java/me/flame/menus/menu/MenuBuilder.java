@@ -129,30 +129,6 @@ public class MenuBuilder {
         return this;
     }
 
-    public MenuBuilder nextPageItem(Slot nextItemSlot, MenuItem nextItem) {
-        if (!nextItemSlot.isValid()) {
-            throw new IllegalArgumentException(
-                "Next item slot is not valid" +
-                " (slot: " + nextItemSlot.slot + ", item: " + nextItem + ")" +
-                "\nFix: The slot is not in the range of 0-" + (rows * 9 - 1) +
-                " (rows: " + rows + "), and slot row: " + (nextItemSlot.row) + ", column: " + (nextItemSlot.column)
-            );
-        }
-        return nextPageItem(nextItemSlot.slot, nextItem);
-    }
-
-    public MenuBuilder previousPageItem(@NotNull Slot previousItemSlot, MenuItem previousItem) {
-        if (!previousItemSlot.isValid()) {
-            throw new IllegalArgumentException(
-                "Next item slot is not valid" +
-                " (slot: " + previousItemSlot.slot + ", item: " + nextItem + ")" +
-                "\nFix: The slot is not in the range of 0-" + (rows * 9 - 1) +
-                " (rows: " + rows + "), and slot row: " + (previousItemSlot.row) + ", column: " + (previousItemSlot.column)
-            );
-        }
-        return previousPageItem(previousItemSlot.slot, previousItem);
-    }
-
     @NotNull
     @Contract(" -> new")
     public Menu normal() {
