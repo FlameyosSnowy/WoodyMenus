@@ -196,7 +196,7 @@ public final class MenuListeners implements Listener {
         if (nbt == null || !nbt.equals(menuItem.getUniqueId().toString())) return;
 
         if (menuItem.isOnCooldown(player)) return;
-        menuItem.click(slot, actionEvent);
+        menuItem.click(player, actionEvent);
         if (menu instanceof PaginatedMenu) handlePaginatedMenu((PaginatedMenu) menu, player, slot);
     }
 
