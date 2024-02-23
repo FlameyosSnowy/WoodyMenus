@@ -356,7 +356,6 @@ public final class PaginatedMenu extends Menu implements Pagination {
     }
 
     public void addItems(@NotNull MenuItem... items) {
-        Bukkit.getLogger().info("1 -> " + items.length);
         // make a mutable list of items to add
         List<MenuItem> toAdd = new ArrayList<>();
         ItemData oldPage = data;
