@@ -1,167 +1,100 @@
 package me.flame.menus.menu;
 
-/**
- * Iteration direction of a {@link Menu}
- * @author Mqzn (Mqzen), FlameyosFlow (Mostly Mqzen)
- */
 @SuppressWarnings("unused")
 public enum IterationDirection {
     HORIZONTAL {
         @Override
-        public Slot shift(Slot oldPos, int maxRows) {
-            int oldCol = oldPos.column;
-            int oldRow = oldPos.row;
-
-            return oldCol == 9 && oldRow < maxRows
-                    ? oldPos.setSlot(oldRow + 1, 1)
-                    : oldPos.setSlot(oldRow, oldCol + 1);
+        public int shift(int slot, int size) {
+            // Shift to the next slot horizontally
+            return slot >= size ? -1 : slot + 1;
         }
     },
 
     VERTICAL {
         @Override
-        public Slot shift(Slot oldPos, int maxRows) {
-            int oldCol = oldPos.column;
-            int oldRow = oldPos.row;
-
-            return (oldCol < 9 && oldRow == maxRows)
-                    ? oldPos.setSlot(1, oldCol + 1)
-                    : oldPos.setSlot(oldRow + 1, oldCol);
+        public int shift(int slot, int size) {
+            int col = (slot % 9) + 1;
+            int row = ((slot - 1) / 9) + 1;
+            if (row == 6) {
+                if (col == 9) {
+                    return -1;
+                } else {
+                    return slot - (size - 9);
+                }
+            }
+            return (slot + 9 > size) ? -1 : slot + 9;
         }
     },
 
     UPWARDS_ONLY {
         @Override
-        public Slot shift(Slot oldPos, int maxRows) {
-            return new Slot(oldPos.row - 1, oldPos.column);
+        public int shift(int slot, int size) {
+            return (slot - 9 < 0) ? -1 : slot - 9;
         }
     },
 
     DOWNWARDS_ONLY {
         @Override
-        public Slot shift(Slot oldPos, int maxRows) {
-            return new Slot(oldPos.row + 1, oldPos.column);
+        public int shift(int slot, int size) {
+            return (slot + 9 >= size) ? -1 : slot + 9;
         }
     },
 
     RIGHT_ONLY {
         @Override
-        public Slot shift(Slot oldPos, int maxRows) {
-            int col = oldPos.column + 1;
-            return col > 9 ? Slot.NaS : oldPos.setSlot(oldPos.row, col);
+        public int shift(int slot, int size) {
+            return slot / 9 != ((slot + 1) / 9) ? -1 : slot + 1;
         }
     },
 
     LEFT_ONLY {
         @Override
-        public Slot shift(Slot oldPos, int maxRows) {
-            int col = oldPos.column - 1;
-            return col < 0 ? Slot.NaS : oldPos.setSlot(oldPos.row, col);
+        public int shift(int slot, int size) {
+            return slot / 9 != ((slot + 1) / 9) ? -1 : slot - 1;
         }
     },
 
     RIGHT_UPWARDS_ONLY {
         @Override
-        public Slot shift(Slot oldPos, int maxRows) {
-            Slot upwardSlot = UPWARDS_ONLY.shift(oldPos, maxRows);
-            Slot rightSlot = RIGHT_ONLY.shift(oldPos, maxRows);
-            return oldPos.setSlot(upwardSlot.row, rightSlot.column);
+        public int shift(int slot, int size) {
+            return (slot - 8 < 0 || slot - 8 >= size) ? -1 : slot - 8;
         }
     },
 
     RIGHT_DOWNWARDS_ONLY {
         @Override
-        public Slot shift(Slot oldPos, int maxRows) {
-            Slot downwardSlot = DOWNWARDS_ONLY.shift(oldPos, maxRows);
-            Slot rightSlot = RIGHT_ONLY.shift(oldPos, maxRows);
-            return oldPos.setSlot(downwardSlot.row, rightSlot.column);
+        public int shift(int slot, int size) {
+            return (slot + 10 >= size) ? -1 : slot + 10;
         }
     },
 
     LEFT_UPWARDS {
         @Override
-        public Slot shift(Slot oldPos, int maxRows) {
-            Slot upwardSlot = UPWARDS_ONLY.shift(oldPos, maxRows);
-            Slot leftSlot = LEFT_ONLY.shift(oldPos, maxRows);
-            return oldPos.setSlot(upwardSlot.row, leftSlot.column);
+        public int shift(int slot, int size) {
+            return (slot - 10 < 0 || slot - 10 >= size) ? -1 : slot - 10;
         }
     },
 
     LEFT_DOWNWARDS {
         @Override
-        public Slot shift(Slot oldPos, int maxRows) {
-            Slot downwardSlot = DOWNWARDS_ONLY.shift(oldPos, maxRows);
-            Slot leftSlot = LEFT_ONLY.shift(oldPos, maxRows);
-            return oldPos.setSlot(downwardSlot.row, leftSlot.column);
+        public int shift(int slot, int size) {
+            return (slot + 8 >= size) ? -1 : slot + 8;
         }
     },
 
     BACKWARDS_HORIZONTAL {
         @Override
-        public Slot shift(Slot oldPos, int maxRows) {
-            int oldCol = oldPos.column;
-            int oldRow = oldPos.row;
-
-            if (oldCol == 1 && oldRow >= 1) {
-                oldCol = 9;
-                oldRow--;
-            } else {
-                oldCol--;
-            }
-
-            return oldPos.setSlot(oldRow, oldCol);
+        public int shift(int slot, int size) {
+            return (slot - 1 < 0) ? -1 : slot - 1;
         }
     },
 
     BACKWARDS_VERTICAL {
         @Override
-        public Slot shift(Slot oldPos, int maxRows) {
-            int oldCol = oldPos.column;
-            int oldRow = oldPos.row;
-
-            if (oldCol > 1 && oldRow < 6) {
-                oldCol--;
-                oldRow = 6;
-            } else {
-                oldRow--;
-            }
-
-            return oldPos.setSlot(oldRow, oldCol);
+        public int shift(int slot, int size) {
+            return (slot - size < 0) ? -1 : slot - size;
         }
     };
 
-    /**
-     * Shifting the slot "oldPos" by "maxRows" to the next slot.
-     *
-     * @param  oldPos   the old position to shift FROM
-     * @param  maxRows  the maximum amount of rows the menu may have
-     * @return          the shifted position that can AND will depend on the {@link IterationDirection} direction
-     *                  <p>How different directions work:</p>
-     *                  <p></p>
-     *                  HORIZONTAL: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, etc.
-     *                  <p></p>
-     *                  VERTICAL: 0, 9, 18, 27, 36, 45, 1, 10, etc.
-     *                  <p></p>
-     *                  UPWARDS_ONLY: 45, 36, 27, 18, 9, 0.
-     *                  <p></p>
-     *                  DOWNWARDS_ONLY: 0, 9, 18, 27, 36, 45.
-     *                  <p></p>
-     *                  RIGHT_ONLY: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9.
-     *                  <p></p>
-     *                  LEFT_ONLY: 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
-     *                  <p></p>
-     *                  RIGHT_UPWARDS_ONLY: 45, 37, 29, 21, 13, 5, 0.
-     *                  <p></p>
-     *                  RIGHT_DOWNWARDS_ONLY: 0, 10, 20, 30, 40, 50.
-     *                  <p></p>
-     *                  LEFT_UPWARDS: 53, 44, 35, 26, 17, 8, 0.
-     *                  <p></p>
-     *                  LEFT_DOWNWARDS: 7, 16, 25, 34, 40, 48.
-     *                  <p></p>
-     *                  BACKWARDS_HORIZONTAL: 53, 52, 51, 50, 49, etc.
-     *                  <p></p>
-     *                  BACKWARDS_VERTICAL: 53, 44, 35, 26, 17, 17, 8, 52, etc.
-     *
-     */
-    public abstract Slot shift(Slot oldPos, int maxRows);
+    public abstract int shift(int slot, int size);
 }
