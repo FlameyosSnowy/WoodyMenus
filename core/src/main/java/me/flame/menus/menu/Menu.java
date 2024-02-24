@@ -248,9 +248,7 @@ public class Menu implements IMenu, RandomAccess, Serializable {
         SCHEDULER.runTaskTimer(plugin, this::update, delay.toMillis() / 50, repeatTime.toMillis() / 50);
     }
 
-    public void updateTitle(String title) {
-        updateTitle(TextHolder.of(title));
-    }
+    public void updateTitle(String title) { updateTitle(TextHolder.of(title)); }
 
     public void updateTitle(TextHolder title) {
         Inventory oldInventory = inventory, updatedInventory = copyInventory(type, title, this, rows);
@@ -365,9 +363,7 @@ public class Menu implements IMenu, RandomAccess, Serializable {
         return new Menu(type, title, modifiers, true);
     }
 
-    public static @NotNull Menu create(@NotNull MenuData menuData) {
-        return menuData.intoMenu();
-    }
+    public static @NotNull Menu create(@NotNull MenuData menuData) { return menuData.intoMenu(); }
 
     public @NotNull @Override PaginatedMenu pagination(int pages) {
         PaginatedMenu menu = PaginatedMenu.create(title, rows, pages, modifiers);
