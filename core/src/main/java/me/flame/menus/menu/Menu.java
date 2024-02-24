@@ -279,9 +279,7 @@ public class Menu implements IMenu, RandomAccess, Serializable {
 
     public boolean addAllModifiers() { return modifiers.addAll(Modifier.ALL); }
 
-    public void removeAllModifiers() {
-        Modifier.ALL.forEach(modifiers::remove);
-    }
+    public void removeAllModifiers() { Modifier.ALL.forEach(modifiers::remove); }
 
     public boolean areItemsPlaceable() {
         return !modifiers.contains(Modifier.DISABLE_ITEM_ADD);
@@ -314,12 +312,6 @@ public class Menu implements IMenu, RandomAccess, Serializable {
     public @NotNull ItemData getData() { return new ItemData(this.data); }
 
     public @NotNull @Unmodifiable List<MenuItem> getItemList() { return ImmutableList.copyOf(getItems()); }
-
-    public @NotNull @Unmodifiable Map<Integer, MenuItem> getItemMap() { return copyItems(new HashMap<>(size)); }
-
-    public @NotNull @Unmodifiable Map<Integer, MenuItem> getLinkedItemMap() { return copyItems(new LinkedHashMap<>(size)); }
-
-    public @NotNull @Unmodifiable Map<Integer, MenuItem> getConcurrentItemMap() { return copyItems(new ConcurrentHashMap<>(size)); }
 
     @Override
     public boolean hasAnimations() { return !animations.isEmpty(); }
@@ -400,11 +392,6 @@ public class Menu implements IMenu, RandomAccess, Serializable {
     public Menu copy() { return create(getMenuData()); }
 
     public @NotNull @Contract(" -> new") static MenuBuilder builder() { return new MenuBuilder(); }
-
-    private @NotNull @UnmodifiableView Map<Integer, MenuItem> copyItems(Map<Integer, MenuItem> items) {
-        for (int i = 0; i < size; i++) items.put(i, data.getItem(i));
-        return Collections.unmodifiableMap(items);
-    }
 
     @Override
     public String getTitle() { return title.toString(); }
