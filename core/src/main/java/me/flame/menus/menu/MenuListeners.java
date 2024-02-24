@@ -67,11 +67,6 @@ public final class MenuListeners implements Listener {
         int slot = event.getSlot(), raw = event.getRawSlot();
 
         Inventory clickedInventory = event.getClickedInventory();
-        InventoryType.SlotType type = event.getSlotType();
-        ClickType click = event.getClick();
-        InventoryAction action = event.getAction();
-        ItemStack current = event.getCurrentItem();
-        //ClickActionEvent clicked = new ClickActionEvent(view, type, raw, slot, click, current, action);
 
         Menu menu = ((Menu) holder);
         if (clickedInventory == null) {
@@ -84,10 +79,10 @@ public final class MenuListeners implements Listener {
             if (response != null) response.execute((Player) event.getWhoClicked(), event);
         }
 
-        if (modifierDetected(menu, action, clickedInventory.getType(), inventory.getType()))
+        if (modifierDetected(menu, event.getAction(), clickedInventory.getType(), inventory.getType()))
             event.setResult(Event.Result.DENY);
         executeActions(event, view, menu, inventory, clickedInventory);
-        executeItem(event, menu, current, (Player) event.getWhoClicked(), slot);
+        executeItem(event, menu, event.getCurrentItem(), (Player) event.getWhoClicked(), slot);
     }
 
     @EventHandler
