@@ -152,7 +152,6 @@ public class Menu implements IMenu, RandomAccess, Serializable {
 
     public void setItem(int slot, ItemStack item) {
         this.data.setItem(slot, MenuItem.of(item));
-        changed = true;
     }
 
     public void setItem(int slot, MenuItem item) {
