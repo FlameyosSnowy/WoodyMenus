@@ -152,21 +152,21 @@ Here's how to add Woody to your ~~bad~~ code:
 ```xml
 <repositories>
     <repository>
-        <groupId>com.github.coderFlameyosFlow.WoodyMenus</groupId>
+        <groupId>com.github.FlameyosSnowy.WoodyMenus</groupId>
         <artifactId>core</artifactId>
-        <version>2.0.6</version>
+        <version>2.0.7</version>
     </repository>
 </repositories>
 ```
 
-or the gradle kotlin edition: (~~guess your code isn't that bad after all~~)
+or the gradle kotlin edition: ~~guess your code isn't that bad after all~~
 ```kt
 repositories {
     maven("https://jitpack.io")
 }
 
 dependencies {
-    implementation("com.github.coderFlameyosFlow.WoodyMenus:core:2.0.6")
+    implementation("com.github.FlameyosSnowy.WoodyMenus:core:2.0.7")
 }
 ```
 > [!CAUTION]
