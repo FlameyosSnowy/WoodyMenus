@@ -48,8 +48,8 @@ public final class PaginatedMenu extends Menu implements Pagination {
         return pageClass.cast(pageDecorator);
     }
 
-    public PageDecoration getPageDecorator() {
-        return getPageDecorator(PageDecoration.class);
+    public MenuFiller getPageDecorator() {
+        return pageDecorator;
     }
 
     /**
