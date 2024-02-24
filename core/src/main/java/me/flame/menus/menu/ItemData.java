@@ -59,19 +59,26 @@ public class ItemData {
         return changed;
     }
 
+    /**
+     *
+     * @param slot the slot
+     * @param guiItem the item
+     * @param notAddedItems the list of items to add to, if the item wasn't added
+     * @return True if the item was added, false otherwise
+     */
     private boolean add(int slot, @NotNull final MenuItem guiItem, @NotNull final List<MenuItem> notAddedItems) {
         try {
             while (items[slot] != null) slot++;
         } catch (ArrayIndexOutOfBoundsException ignored) {
-            return true;
+            return false;
         }
         if (slot > menu.size) { // if the slot is out of bounds
-            if (menu.rows == 6) return true;
+            //if (menu.rows == 6) return true;
             notAddedItems.add(guiItem);
-            return true;
+            return false;
         }
         items[slot] = guiItem;
-        return false;
+        return true;
     }
 
     public boolean addItem(@NotNull final MenuItem... items) {
@@ -82,13 +89,16 @@ public class ItemData {
 
         int slot = 0;
         boolean changed = false;
+        boolean skip = false;
         for (final MenuItem menuItem : items) {
-            if(changed) {
+            if(skip) {
                 notAddedItems.add(menuItem);
                 continue;
             }
             if (this.add(slot, menuItem, notAddedItems)){
                 changed = true;
+            } else {
+                skip = true;
             }
             slot++;
         }
@@ -144,10 +154,6 @@ public class ItemData {
         MenuItem oldItem = items[index];
         items[index] = null;
         return oldItem;
-    }
-
-    public void setItem(int slot, ItemStack itemStack) {
-        items[slot] = MenuItem.of(itemStack);
     }
 
     public boolean hasItem(int slot) {
