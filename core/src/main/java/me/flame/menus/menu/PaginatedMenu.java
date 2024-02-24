@@ -361,18 +361,19 @@ public final class PaginatedMenu extends Menu implements Pagination {
         ItemData oldPage = data;
         int size = pages.size();
         for (ItemData page : pages) {
+            if (items.length == 0) return;
             page.addItem(toAdd, items);
             items = toAdd.toArray(new MenuItem[0]);
             toAdd.clear();
         }
+        if (!dynamicSizing) return;
         toAdd = new ArrayList<>(List.of(items));
         while (!toAdd.isEmpty()){
             MenuItem[] leftToAdd = toAdd.toArray(new MenuItem[0]);
             toAdd.clear();
             page(addPage());
-            getPage(pageNumber).addItem(toAdd, leftToAdd);
+            data.addItem(toAdd, leftToAdd);
         }
-        page(0);
         super.changed = true;
         update();
     }
