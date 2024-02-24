@@ -21,24 +21,15 @@ import java.util.stream.Stream;
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public interface IMenu extends InventoryHolder {
     /**
-     * Get a map of the items in the menu.
-     * <p>This is an unmodifiable map.</p>
-     * <p>Using a map isn't a good idea, it's better to use a list or an array,</p>
-     * <p>Not because a map boxes integers (those are stored in memory) but it's simpler.</p>
-     * @return the item map.
-     */
-    @Unmodifiable Map<Integer, MenuItem> getItemMap();
-
-    /**
      * Get a stream loop of the items in the menu
-     * <p>This is streaming on LinkedHashMap#values()</p>
+     * <p>This is streaming on an array copy</p>
      * @return the stream
      */
     Stream<MenuItem> stream();
 
     /**
      * Get a parallel stream loop of the items in the menu
-     * <p>This is streaming on LinkedHashMap#values()</p>
+     * <p>This is streaming on an array copy</p>
      * @apiNote use this if you want to do things in parallel, and you're sure of how to use it, else it might even get slower than the normal .stream()
      * @return the stream
      */
@@ -319,28 +310,7 @@ public interface IMenu extends InventoryHolder {
      */
     @NotNull ItemData getData();
 
-    /**
-     * Get a linked map of the items in the menu.
-     * <p>This is an unmodifiable linked map.</p>
-     * <p>Using a map isn't a good idea, it's better to use a list or an array,</p>
-     * <p>Not because a map boxes integers (those are stored in memory) but it's simpler.</p>
-     * @return the item map.
-     * @apiNote A linked map shouldn't be used when unmodifiable, it's better to use a list or an array
-     *          Some people HAVE to use a map, use {@link #getConcurrentItemMap()} for concurrency or {@link #getItemMap()} for better performance
-     *          and memory consumption.
-     */
-    @NotNull
-    @Unmodifiable Map<Integer, MenuItem> getLinkedItemMap();
-
-    /**
-     * Get a concurrent map of the items in the menu.
-     * <p>This is an unmodifiable concurrent map.</p>
-     * @return the item map.
-     * @apiNote unless you need concurrency, you should use {@link #getItemMap()} or even better, a list/array/{@link #getData()}
-     */
-
-    @NotNull
-    @Unmodifiable Map<Integer, MenuItem> getConcurrentItemMap();
+   
 
     /**
      * Checks if the animations has any animations to execute
