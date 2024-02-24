@@ -64,21 +64,22 @@ public class ItemData {
      * @param slot the slot
      * @param guiItem the item
      * @param notAddedItems the list of items to add to, if the item wasn't added
-     * @return True if the item was added, false otherwise
+     * @return 0 for successful addition, -1 to indicate that the menu can't be resized and 1 to indicate it is in resizing process
      */
-    private boolean add(int slot, @NotNull final MenuItem guiItem, @NotNull final List<MenuItem> notAddedItems) {
+    private int add(int slot, @NotNull final MenuItem guiItem, @NotNull final List<MenuItem> notAddedItems) {
+        boolean failed = false;
         try {
             while (items[slot] != null) slot++;
         } catch (ArrayIndexOutOfBoundsException ignored) {
-            return false;
+            failed = true;
         }
-        if (slot > menu.size) { // if the slot is out of bounds
-            //if (menu.rows == 6) return true;
+        if (failed) { // if the slot is out of bounds
+            if (menu.rows == 6) return -1;
             notAddedItems.add(guiItem);
-            return false;
+            return 1;
         }
         items[slot] = guiItem;
-        return true;
+        return 0;
     }
 
     public boolean addItem(@NotNull final MenuItem... items) {
@@ -90,15 +91,19 @@ public class ItemData {
         int slot = 0;
         boolean changed = false;
         boolean skip = false;
-        for (final MenuItem menuItem : items) {
-            if(skip) {
+        for (MenuItem menuItem : items) {
+            if (skip) {
                 notAddedItems.add(menuItem);
                 continue;
             }
-            if (this.add(slot, menuItem, notAddedItems)){
-                changed = true;
-            } else {
-                skip = true;
+            switch (this.add(slot, menuItem, notAddedItems)) {
+                case 0:
+                    changed = true;
+                    break;
+                case 1:
+                    skip = true;
+                    break;
+                default: return changed;
             }
             slot++;
         }
@@ -113,7 +118,7 @@ public class ItemData {
     }
 
     private void checkSizing(List<MenuItem> notAddedItems) {
-        if (menu.dynamicSizing && notAddedItems.isEmpty() && (menu.rows < 6 && menu.type == MenuType.CHEST)) {
+        if (menu.dynamicSizing && notAddedItems.isEmpty() && menu.type == MenuType.CHEST) {
             this.recreateInventory();
             this.addItem(notAddedItems.toArray(new MenuItem[0]));
             menu.update();
