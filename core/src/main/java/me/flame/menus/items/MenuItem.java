@@ -4,16 +4,17 @@ import lombok.Getter;
 import lombok.Setter;
 
 import me.flame.menus.components.nbt.ItemNbt;
-import me.flame.menus.events.ClickActionEvent;
 import me.flame.menus.items.states.State;
 import me.flame.menus.util.ItemResponse;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Nameable;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import org.bukkit.inventory.meta.ItemMeta;
@@ -146,10 +147,11 @@ public final class MenuItem implements Nameable, Cloneable, Serializable, Compar
         }
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public CompletableFuture<Void> click(final Player player, final InventoryClickEvent event) {
         return async
-                ? clickAction.thenApplyAsync(ca -> ca.apply(player, event))
-                : clickAction.thenApply(ca -> ca.apply(player, event));
+                ? clickAction.thenAcceptAsync(ca -> ca.execute(player, event))
+                : clickAction.thenAccept(ca -> ca.execute(player, event));
     }
 
     @Override

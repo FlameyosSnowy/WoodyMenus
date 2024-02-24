@@ -11,6 +11,7 @@ import me.flame.menus.items.MenuItem;
 import me.flame.menus.menu.fillers.*;
 import me.flame.menus.modifiers.Modifier;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 
@@ -32,6 +33,9 @@ public final class PaginatedMenu extends Menu implements Pagination {
     @NotNull
     final List<ItemData> pages;
 
+    private final Map<Integer, MenuItem> pageItems = new HashMap<>();
+
+    @Getter
     private int pageNumber;
 
     private @Getter int nextItemSlot = -1, previousItemSlot = -1;
@@ -48,8 +52,25 @@ public final class PaginatedMenu extends Menu implements Pagination {
         return getPageDecorator(PageDecoration.class);
     }
 
-    public void addPage() {
+    /**
+     * Adds a blank page to the menu.
+     * @return the index the page was added at
+     */
+    public int addPage() {
         pages.add(new ItemData(this));
+        return pages.size() - 1;
+    }
+
+    public void setPageItems(ItemData items) {
+        if(pageItems == null)
+            return;
+        for (int i : pageItems.keySet()) {
+            items.setItem(i, pageItems.get(i));
+        }
+        if(nextItemSlot != -1)
+            items.setItem(nextItemSlot, pages.get(0).getItem(nextItemSlot));
+        if(previousItemSlot != -1)
+            items.setItem(previousItemSlot, pages.get(0).getItem(previousItemSlot));
     }
 
     /**
@@ -179,64 +200,6 @@ public final class PaginatedMenu extends Menu implements Pagination {
     }
 
     /**
-     * Sets the next page item for the given slot with the provided item stack.
-     *
-     * @param  slot        the position of the slot
-     * @param  item        the item stack to set
-     * @deprecated Use {@link MenuBuilder#nextPageItem(int, MenuItem)}
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval(inVersion = "2.1.0")
-    public void setNextPageItem(int slot, @NotNull MenuItem item) {
-        this.nextItemSlot = slot;
-        pages.forEach(page -> page.setItem(slot, item));
-    }
-
-    /**
-     * Sets the next page item for the given slot with the provided item stack.
-     *
-     * @param  pos         the position of the slot
-     * @param  item        the item stack to set
-     * @deprecated Use {@link MenuBuilder#nextPageItem(Slot, MenuItem)}
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval(inVersion = "2.1.0")
-    public void setNextPageItem(@NotNull Slot pos, @NotNull MenuItem item) {
-        int slot = pos.slot;
-        this.nextItemSlot = slot;
-        pages.forEach(page -> page.setItem(slot, item));
-    }
-
-    /**
-     * Sets the previous page item at the given position with the specified menu item.
-     *
-     * @param  slot  the position of the slot
-     * @param  item  the menu item to set
-     * @deprecated Use {@link MenuBuilder#previousPageItem(int, MenuItem)}
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval(inVersion = "2.1.0")
-    public void setPreviousPageItem(int slot, @NotNull MenuItem item) {
-        this.previousItemSlot = slot;
-        pages.forEach(page -> page.setItem(slot, item));
-    }
-
-    /**
-     * Sets the previous page item at the given position with the specified menu item.
-     *
-     * @param  pos   the position of the slot
-     * @param  item  the menu item to set
-     * @deprecated Use {@link MenuBuilder#previousPageItem(Slot, MenuItem)}
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval(inVersion = "2.1.0")
-    public void setPreviousPageItem(@NotNull Slot pos, @NotNull MenuItem item) {
-        int slot = pos.slot;
-        this.previousItemSlot = slot;
-        pages.forEach(page -> page.setItem(slot, item));
-    }
-
-    /**
      * Opens the GUI to a specific page for the given player
      *
      * @param player   The {@link HumanEntity} to open the GUI to
@@ -269,7 +232,7 @@ public final class PaginatedMenu extends Menu implements Pagination {
     }
 
     /**
-     * Gets the current page number
+     * Gets the current page number (Inflated by 1)
      *
      * @return The current page number
      */
@@ -301,7 +264,7 @@ public final class PaginatedMenu extends Menu implements Pagination {
 
         pageNumber++;
         this.data = pages.get(pageNumber);
-
+        super.changed = true;
         update();
         return true;
     }
@@ -318,6 +281,7 @@ public final class PaginatedMenu extends Menu implements Pagination {
         pageNumber--;
         this.data = pages.get(pageNumber);
 
+        super.changed = true;
         update();
         return true;
     }
@@ -359,16 +323,6 @@ public final class PaginatedMenu extends Menu implements Pagination {
     }
 
     @Override
-    public void setPageItem(Slot slot, MenuItem item) {
-        for (ItemData page : pages) page.setItem(slot, item);
-    }
-
-    @Override
-    public void removePageItem(Slot slot) {
-        for (ItemData page : pages) page.removeItem(slot);
-    }
-
-    @Override
     public void removePageItem(int slot) {
         for (ItemData page : pages) page.removeItem(slot);
     }
@@ -401,17 +355,45 @@ public final class PaginatedMenu extends Menu implements Pagination {
         for (ItemData page : pages) setPageItem0(page, size, slots, items);
     }
 
+    public void addItems(@NotNull MenuItem... items) {
+        // make a mutable list of items to add
+        List<MenuItem> toAdd = new ArrayList<>();
+        ItemData oldPage = data;
+        int size = pages.size();
+        for (ItemData page : pages) {
+            page.addItem(toAdd, items);
+            items = toAdd.toArray(new MenuItem[0]);
+            toAdd.clear();
+        }
+        toAdd = new ArrayList<>(List.of(items));
+        while (!toAdd.isEmpty()){
+            MenuItem[] leftToAdd = toAdd.toArray(new MenuItem[0]);
+            toAdd.clear();
+            page(addPage());
+            getPage(pageNumber).addItem(toAdd, leftToAdd);
+        }
+        page(0);
+        super.changed = true;
+        update();
+    }
+
     public void setPageItem(int[] slots, MenuItem item) {
         int size = slots.length;
         for (ItemData page : pages) setPageItem0(page, size, slots, item);
     }
 
-    private static void setPageItem0(ItemData page, int size, int[] slots, MenuItem[] items) {
-        for (int i = 0; i < size; i++) page.setItem(slots[i], items[i]);
+    private void setPageItem0(ItemData page, int size, int[] slots, MenuItem[] items) {
+        for (int i = 0; i < size; i++) {
+            page.setItem(slots[i], items[i]);
+            this.pageItems.put(slots[i], items[i]);
+        }
     }
 
-    private static void setPageItem0(ItemData page, int size, int[] slots, MenuItem item) {
-        for (int i = 0; i < size; i++) page.setItem(slots[i], item);
+    private void setPageItem0(ItemData page, int size, int[] slots, MenuItem item) {
+        for (int i = 0; i < size; i++) {
+            page.setItem(slots[i], item);
+            this.pageItems.put(slots[i], item);
+        }
     }
 
     @Override
@@ -420,30 +402,8 @@ public final class PaginatedMenu extends Menu implements Pagination {
     }
 
     public void setPageItem(int slot, MenuItem item) {
+        this.pageItems.put(slot, item);
         for (ItemData page : pages) page.setItem(slot, item);
-    }
-
-    @Override
-    public void setPageItem(Slot slot, ItemStack item) {
-        setPageItem(slot, MenuItem.of(item));
-    }
-
-    @Override
-    public void setPageItem(Slot[] slots, ItemStack... items) {
-        for (ItemData page : pages) setPageItem0(page, slots.length, slots, items);
-    }
-
-    private static void setPageItem0(ItemData page, int size, Slot[] slots, ItemStack... items) {
-        for (int i = 0; i < size; i++) page.setItem(slots[i], MenuItem.of(items[i]));
-    }
-
-    @Override
-    public void setPageItem(Slot[] slots, ItemStack item) {
-        for (ItemData page : pages) setPageItem0(page, slots.length, slots, item);
-    }
-
-    private static void setPageItem0(ItemData page, int size, Slot[] slots, ItemStack item) {
-        for (Slot slot : slots) page.setItem(slot, MenuItem.of(item));
     }
 
     @Override

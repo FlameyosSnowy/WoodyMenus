@@ -4,16 +4,13 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import me.flame.menus.adventure.TextHolder;
 import me.flame.menus.util.ItemResponse;
 import me.flame.menus.util.VersionHelper;
-
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -121,7 +118,8 @@ public class ItemEditor {
      * @return the builder for chaining
      */
     public ItemEditor setLore(@NotNull List<String> lore) {
-        return this.setLore(lore.toArray(String[]::new));
+        meta.setLore(lore);
+        return this;
     }
 
     /**
@@ -233,26 +231,6 @@ public class ItemEditor {
 
     public ItemEditor setAction(@NotNull ItemResponse event) {
         this.clickAction = CompletableFuture.completedFuture(event);
-        return this;
-    }
-
-    /**
-     * @deprecated Very bad way for async actions, use {@link MenuItem#setAsync(boolean)}
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval(inVersion = "2.1.0")
-    public ItemEditor setActionAsync(@NotNull CompletableFuture<ItemResponse> event) {
-        this.clickAction = event;
-        return this;
-    }
-
-    /**
-     * @deprecated Very bad way for async actions, use {@link MenuItem#setAsync(boolean)}
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval(inVersion = "2.1.0")
-    public ItemEditor setActionAsync(@NotNull ItemResponse event) {
-        this.clickAction = CompletableFuture.supplyAsync(() -> event);
         return this;
     }
 
