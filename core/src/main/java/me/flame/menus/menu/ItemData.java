@@ -83,20 +83,19 @@ public class ItemData {
     }
 
     public boolean addItem(@NotNull final MenuItem... items) {
-        return addItem(new ArrayList<>(), items);
+        return addItem(new ArrayList<>(items.length), items);
     }
 
-    public boolean addItem(final List<MenuItem> notAddedItems, @NotNull final MenuItem... items) {
-
+    public boolean addItem(final List<MenuItem> toAdd, @NotNull final MenuItem... items) {
         int slot = 0;
         boolean changed = false;
         boolean skip = false;
-        for (MenuItem menuItem : items) {
+        for (final MenuItem item : items) {
             if (skip) {
-                notAddedItems.add(menuItem);
+                toAdd.add(item);
                 continue;
             }
-            switch (this.add(slot, menuItem, notAddedItems)) {
+            switch (add(slot, item, toAdd)) {
                 case 0:
                     changed = true;
                     break;
@@ -108,7 +107,7 @@ public class ItemData {
             slot++;
         }
 
-        checkSizing(notAddedItems);
+        checkSizing(toAdd);
         return changed;
     }
 
@@ -117,8 +116,8 @@ public class ItemData {
         return addItem(items.toArray(new MenuItem[0]));
     }
 
-    private void checkSizing(List<MenuItem> notAddedItems) {
-        if (menu.dynamicSizing && notAddedItems.isEmpty() && menu.type == MenuType.CHEST) {
+    private void checkSizing(List<MenuItem> toAdd) {
+        if (menu.dynamicSizing && !toAdd.isEmpty() && menu.type == MenuType.CHEST) {
             this.recreateInventory();
             this.addItem(notAddedItems.toArray(new MenuItem[0]));
             menu.update();
@@ -195,8 +194,8 @@ public class ItemData {
         Set<MenuItem> items = ImmutableSet.copyOf(removingItems);
         int size = menu.size();
 
-        for (int itemIndex = 0; itemIndex < size && items.contains(this.items[itemIndex]); itemIndex++) {
-            this.items[itemIndex] = null;
+        for (int index = 0; index < size; index++) {
+            if (items.contains(this.items[index])) this.items[index] = null;
         }
     }
 
