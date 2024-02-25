@@ -203,16 +203,12 @@ public class Menu implements IMenu, RandomAccess, Serializable {
     }
 
     public void removeItem(@NotNull final MenuItem... items) {
-        Set<MenuItem> set = ImmutableSet.copyOf(items);
-        data.indexed((item, index) -> { if (set.contains(item)) this.data.removeItem(index); });
-        changed = true;
+        changed = data.removeItem(items);
     }
 
     @Override
     public void removeItem(@NotNull final List<MenuItem> itemStacks) {
-        Set<MenuItem> set = ImmutableSet.copyOf(itemStacks);
-        data.indexed((item, index) -> { if (set.contains(item)) this.data.removeItem(index); });
-        changed = true;
+        removeItem(itemStacks.toArray(new MenuItem[0]));
     }
 
     @Contract("_ -> new")
