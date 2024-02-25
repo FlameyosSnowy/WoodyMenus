@@ -172,11 +172,11 @@ public class Menu implements IMenu, RandomAccess, Serializable {
     }
 
     public boolean hasItem(ItemStack item) {
-        return data.getItem(itemOne -> itemOne.getItemStack().equals(item)) != null;
+        return data.findFirst(itemOne -> itemOne.getItemStack().equals(item)) != null;
     }
 
     public boolean hasItem(MenuItem item) {
-        return this.getItem(itemOne -> itemOne.equals(item)) != null;
+        return data.findFirst(itemOne -> itemOne.equals(item)) != null;
     }
 
     public Optional<MenuItem> get(Predicate<MenuItem> itemDescription) {
