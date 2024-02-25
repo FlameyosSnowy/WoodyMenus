@@ -181,22 +181,28 @@ public class ItemData {
         return items.length;
     }
 
-    public void removeItem(Predicate<MenuItem> item) {
+    public boolean removeItem(Predicate<MenuItem> item) {
+        boolean changed = false;
         for (int i = 0; i < items.length; i++) {
             if (item.test(items[i])) {
                 removeItem(i);
-                return;
+                changed = true;
             }
         }
+        return changed;
     }
 
-    public void removeItem(MenuItem @NotNull [] removingItems) {
+    public boolean removeItem(MenuItem @NotNull [] removingItems) {
         Set<MenuItem> items = ImmutableSet.copyOf(removingItems);
         int size = menu.size();
 
+        boolean changed = false;
         for (int index = 0; index < size; index++) {
-            if (items.contains(this.items[index])) this.items[index] = null;
+            if (!items.contains(this.items[index])) continue;
+            this.items[index] = null;
+            changed = true;
         }
+        return changed;
     }
 
     public void recreateItems(Inventory inventory) {
