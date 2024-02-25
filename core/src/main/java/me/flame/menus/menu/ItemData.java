@@ -185,7 +185,7 @@ public class ItemData {
         boolean changed = false;
         for (int i = 0; i < items.length; i++) {
             if (item.test(items[i])) {
-                removeItem(i);
+                this.items[i] = null;
                 changed = true;
             }
         }
@@ -198,7 +198,9 @@ public class ItemData {
 
         boolean changed = false;
         for (int index = 0; index < size; index++) {
-            if (!items.contains(this.items[index])) continue;
+            MenuItem it = this.items[index];
+            if (it == null) continue;
+            if (!items.contains(it)) continue;
             this.items[index] = null;
             changed = true;
         }
@@ -225,8 +227,16 @@ public class ItemData {
     }
 
     public void removeItem(ItemStack[] items) {
-        indexed((item, index) -> {
-            if (items[index].equals(item.getItemStack())) removeItem(index);
-        });
+        Set<ItemStack> itemStacks = ImmutableSet.copyOf(items);
+        int size = menu.size();
+        boolean changed = false;
+        for (int i = 0; i < size; i++) {
+            MenuItem it = this.items[i];
+            if (it == null) continue;
+            if (!itemStacks.contains(it.getItemStack())) continue; 
+            this.items[i] = null;
+            changed = true;
+        }
+        return changed;
     }
 }
