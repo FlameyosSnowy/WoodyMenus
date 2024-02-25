@@ -193,13 +193,11 @@ public class Menu implements IMenu, RandomAccess, Serializable {
     }
 
     public void removeItem(@NotNull final ItemStack... itemStacks) {
-        removeItemStacks(List.of(itemStacks));
+        changed = data.removeItem(itemStacks);
     }
 
     public void removeItemStacks(@NotNull final List<ItemStack> itemStacks) {
-        Set<ItemStack> set = ImmutableSet.copyOf(itemStacks);
-        data.indexed((item, index) -> { if (set.contains(item.getItemStack())) this.data.removeItem(index); });
-        changed = true;
+        removeItem(itemStacks.toArray(new MenuItem[0]));
     }
 
     public void removeItem(@NotNull final MenuItem... items) {
