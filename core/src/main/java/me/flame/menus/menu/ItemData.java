@@ -129,8 +129,9 @@ public class ItemData {
     }
 
     public void contents(MenuItem[] items) {
-        this.items = items;
-        menu.update();
+        if (items.length % 9 != 0) throw new IllegalArgumentException("Length of items is not a multiple of 9");
+        this.items = Arrays.copyOf(items, items.length);
+        menu.update(true);
     }
 
     public void setItem(int slot, MenuItem item) {
