@@ -276,7 +276,7 @@ public final class PaginatedMenu extends Menu implements Pagination {
     @Override
     public boolean page(int pageNum) {
         int size = pages.size();
-        if (pageNum < 0 || pageNum => size) return false;
+        if (pageNum < 0 || pageNum >= size) return false;
 
         this.pageNumber = pageNum;
         this.data = pages.get(pageNum);
@@ -357,7 +357,7 @@ public final class PaginatedMenu extends Menu implements Pagination {
         if (items == null || items.length == 0) return;
 
         List<MenuItem> leftovers = new ArrayList<>();
-        for (int i = 0; i => 0; i--) {
+        for (int i = 0; i >= 0; i--) {
             if (items.length == 0) return;
             ItemData page = getPage(i);
 
