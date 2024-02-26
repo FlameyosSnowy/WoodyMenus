@@ -219,10 +219,16 @@ public class Menu implements IMenu, RandomAccess, Serializable {
 
     @Override
     public void update() {
+        update(false);
+    }
+
+    public void update(boolean force) {
+        if (force) {
+            updatePlayerInventories(inventory, player -> ((Player) player).updateInventory());
+            return;
+        }
         if (!changed) return;
-        this.updating = true;
         updatePlayerInventories(inventory, player -> ((Player) player).updateInventory());
-        this.updating = false;
         this.changed = false;
     }
 
@@ -246,15 +252,15 @@ public class Menu implements IMenu, RandomAccess, Serializable {
 
     public void updateTitle(TextHolder title) {
         Inventory oldInventory = inventory, updatedInventory = copyInventory(type, title, this, rows);
-        this.updating = true;
         this.inventory = updatedInventory;
         updatePlayerInventories(oldInventory, player -> player.openInventory(updatedInventory));
-        this.updating = false;
     }
 
     private void updatePlayerInventories(@NotNull Inventory oldInventory, Consumer<HumanEntity> entityPredicate) {
+        this.updating = true;
         data.recreateItems(inventory);
         oldInventory.getViewers().forEach(entityPredicate);
+        this.updating = false;
     }
 
     public void open(@NotNull HumanEntity entity) {
