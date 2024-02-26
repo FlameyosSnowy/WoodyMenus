@@ -193,10 +193,7 @@ public final class PaginatedMenu extends Menu implements Pagination {
 
     @Override
     public void setContents(MenuItem... items) {
-        ItemData itemData = new ItemData(this);
-        itemData.contents(items);
-        pages.set(pageNumber, itemData);
-        data = itemData;
+        data.contents(items);
     }
 
     /**
@@ -283,8 +280,7 @@ public final class PaginatedMenu extends Menu implements Pagination {
 
         this.pageNumber = pageNum;
         this.data = pages.get(pageNum);
-        this.changed = true;
-        update();
+        update(true);
         return true;
     }
 
