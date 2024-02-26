@@ -372,7 +372,7 @@ public final class PaginatedMenu extends Menu implements Pagination {
         if (!dynamicSizing) return;
 
         int newestPageNumber = pageNumber;
-        while (!itemsToAdd.isEmpty()) {
+        while (items.length != 0) {
             int newPageNum = addPage();
             newestPageNumber = newPageNum;
             ItemData newPage = getPage(newPageNum);
