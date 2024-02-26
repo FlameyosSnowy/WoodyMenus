@@ -359,13 +359,15 @@ public final class PaginatedMenu extends Menu implements Pagination {
 
     public void addItems(@NotNull MenuItem... items) {
         if (items == null || items.length == 0) return;
-        List<MenuItem> itemsToAdd = new ArrayList<>(List.of(items));
 
-        for (ItemData page : pages) {
-            if (itemsToAdd.isEmpty()) return;
-            List<MenuItem> leftovers = new ArrayList<>();
-            page.addItem(leftovers, itemsToAdd);
-           itemsToAdd = leftovers;
+        List<MenuItem> leftovers = new ArrayList<>();
+        for (int i = 0; i => 0; i--) {
+            if (items.length == 0) return;
+            ItemData page = getPage(i);
+
+            page.addItem(leftovers, items);
+            items = leftovers.toArray(new MenuItem[0]);
+            leftovers.clear();
         }
         if (!dynamicSizing) return;
 
@@ -374,9 +376,9 @@ public final class PaginatedMenu extends Menu implements Pagination {
             int newPageNum = addPage();
             newestPageNumber = newPageNum;
             ItemData newPage = getPage(newPageNum);
-            List<MenuItem> leftovers = new ArrayList<>();
-            newPage.addItem(leftovers, itemsToAdd);
-           itemsToAdd = leftovers;
+            newPage.addItem(leftovers, items);
+            items = leftovers.toArray(new MenuItem[0]);
+            leftovers.clear();
         }
 
         page(newestPageNumber);
