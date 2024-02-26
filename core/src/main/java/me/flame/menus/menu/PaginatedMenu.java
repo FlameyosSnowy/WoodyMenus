@@ -258,15 +258,7 @@ public final class PaginatedMenu extends Menu implements Pagination {
      */
     @Override
     public boolean next() {
-        int size = pages.size();
-        if (pageNumber + 1 >= size) return false;
-        int oldPageNum = pageNumber;
-
-        pageNumber++;
-        this.data = pages.get(pageNumber);
-        super.changed = true;
-        update();
-        return true;
+        return page(pageNumber + 1);
     }
 
     /**
@@ -276,14 +268,7 @@ public final class PaginatedMenu extends Menu implements Pagination {
      */
     @Override
     public boolean previous() {
-        if (pageNumber - 1 < 0) return false;
-
-        pageNumber--;
-        this.data = pages.get(pageNumber);
-
-        super.changed = true;
-        update();
-        return true;
+        return page(pageNumber - 1);
     }
 
     /**
@@ -294,10 +279,11 @@ public final class PaginatedMenu extends Menu implements Pagination {
     @Override
     public boolean page(int pageNum) {
         int size = pages.size();
-        if (pageNum < 0 || pageNum > size) return false;
+        if (pageNum < 0 || pageNum => size) return false;
 
         this.pageNumber = pageNum;
         this.data = pages.get(pageNum);
+        this.changed = true;
         update();
         return true;
     }
@@ -329,71 +315,80 @@ public final class PaginatedMenu extends Menu implements Pagination {
 
     @Override
     public void removePageItem(ItemStack slot) {
-        for (ItemData page : pages) page.removeItem((item) -> item.getItemStack().equals(slot));
+        for (ItemData page : pages) page.removeItem(slot);
     }
 
     @Override
     public void removePageItem(MenuItem slot) {
-        for (ItemData page : pages) page.removeItem((item) -> item.equals(slot));
+        for (ItemData page : pages) page.removeItem(slot);
     }
 
     @Override
     public void removePageItem(ItemStack... slot) {
         Set<ItemStack> set = ImmutableSet.copyOf(slot);
-        for (ItemData page : pages) page.indexed((item, index) -> { if (set.contains(item.getItemStack())) page.removeItem(index); });
+        for (ItemData page : pages) page.removeItem(slot);
     }
 
     @Override
     public void removePageItem(MenuItem... slot) {
         Set<MenuItem> set = ImmutableSet.copyOf(slot);
-        for (ItemData page : pages) page.indexed((item, index) -> { if (set.contains(item)) page.removeItem(index); });
+        for (ItemData page : pages) page.removeItem(slot);
     }
 
     @Override
     public void setPageItem(int[] slots, MenuItem[] items) {
         int size = slots.length;
-        for (ItemData page : pages) setPageItem0(page, size, slots, items);
+        if (size != items.length) throw new IllegalArgumentException("Number of slots and number of items must be equal.");
+        for (ItemData page : pages) {
+            for (int i = 0; i < size; i++) {
+                page.setItem(slots[i], items[i]);
+                this.pageItems.put(slots[i], items[i]);
+            }
+        }
+    }
+
+    @Override
+    public void setPageItem(int slot, ItemStack item) {
+        setPageItem(slot, MenuItem.of(item));
+    }
+
+    public void setPageItem(int slot, MenuItem item) {
+        this.pageItems.put(slot, item);
+        for (ItemData page : pages) page.setItem(slot, item);
     }
 
     public void addItems(@NotNull MenuItem... items) {
-        // make a mutable list of items to add
-        List<MenuItem> toAdd = new ArrayList<>();
-        ItemData oldPage = data;
-        int size = pages.size();
+        if (items == null || items.length == 0) return;
+        List<MenuItem> itemsToAdd = new ArrayList<>(List.of(items));
+
         for (ItemData page : pages) {
-            if (items.length == 0) return;
-            page.addItem(toAdd, items);
-            items = toAdd.toArray(new MenuItem[0]);
-            toAdd.clear();
+            if (itemsToAdd.isEmpty()) return;
+            List<MenuItem> leftovers = new ArrayList<>();
+            page.addItem(leftovers, itemsToAdd);
+           itemsToAdd = leftovers;
         }
         if (!dynamicSizing) return;
-        toAdd = new ArrayList<>(List.of(items));
-        while (!toAdd.isEmpty()){
-            MenuItem[] leftToAdd = toAdd.toArray(new MenuItem[0]);
-            toAdd.clear();
-            page(addPage());
-            data.addItem(toAdd, leftToAdd);
+
+        int newestPageNumber = pageNumber;
+        while (!itemsToAdd.isEmpty()) {
+            int newPageNum = addPage();
+            newestPageNumber = newPageNum;
+            ItemData newPage = getPage(newPageNum);
+            List<MenuItem> leftovers = new ArrayList<>();
+            newPage.addItem(leftovers, itemsToAdd);
+           itemsToAdd = leftovers;
         }
-        super.changed = true;
-        update();
+
+        page(newestPageNumber);
     }
 
     public void setPageItem(int[] slots, MenuItem item) {
         int size = slots.length;
-        for (ItemData page : pages) setPageItem0(page, size, slots, item);
-    }
-
-    private void setPageItem0(ItemData page, int size, int[] slots, MenuItem[] items) {
-        for (int i = 0; i < size; i++) {
-            page.setItem(slots[i], items[i]);
-            this.pageItems.put(slots[i], items[i]);
-        }
-    }
-
-    private void setPageItem0(ItemData page, int size, int[] slots, MenuItem item) {
-        for (int i = 0; i < size; i++) {
-            page.setItem(slots[i], item);
-            this.pageItems.put(slots[i], item);
+        for (ItemData page : pages) {
+            for (int i = 0; i < size; i++) {
+                page.setItem(slots[i], item);
+                this.pageItems.put(slots[i], item);
+            }
         }
     }
 
@@ -416,5 +411,6 @@ public final class PaginatedMenu extends Menu implements Pagination {
 
     public void setContents(ItemData data) {
         this.data = data;
+        this.changed = true;
     }
 }
