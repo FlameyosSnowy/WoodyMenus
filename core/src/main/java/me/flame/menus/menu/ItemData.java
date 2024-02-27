@@ -119,7 +119,7 @@ public class ItemData {
     private void checkSizing(List<MenuItem> toAdd) {
         if (menu.dynamicSizing && !toAdd.isEmpty() && menu.type == MenuType.CHEST) {
             this.recreateInventory();
-            this.addItem(notAddedItems.toArray(new MenuItem[0]));
+            this.addItem(toAdd.toArray(new MenuItem[0]));
             menu.update();
         }
     }
