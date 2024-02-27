@@ -128,7 +128,7 @@ public class ItemData {
         items = Arrays.copyOf(items, menu.size);
     }
 
-    public void contents(MenuItem[] items) {
+    public void contents(MenuItem... items) {
         if (items.length % 9 != 0) throw new IllegalArgumentException("Length of items is not a multiple of 9");
         this.items = Arrays.copyOf(items, items.length);
         menu.update(true);
@@ -193,7 +193,7 @@ public class ItemData {
         return changed;
     }
 
-    public boolean removeItem(MenuItem @NotNull [] removingItems) {
+    public boolean removeItem(MenuItem... its) {
         Set<MenuItem> items = ImmutableSet.copyOf(removingItems);
         int size = menu.size();
 
@@ -227,7 +227,7 @@ public class ItemData {
         items[slot] = guiItem;
     }
 
-    public void removeItem(ItemStack[] items) {
+    public void removeItem(ItemStack... items) {
         Set<ItemStack> itemStacks = ImmutableSet.copyOf(items);
         int size = menu.size();
         boolean changed = false;
