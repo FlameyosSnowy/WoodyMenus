@@ -50,7 +50,7 @@ public class ItemData {
         boolean changed = false;
         for (final ItemStack item : items) {
             MenuItem menuItem = MenuItem.of(item);
-            if (this.add(slot, menuItem, notAddedItems)) return changed;
+            if (this.add(slot, menuItem, notAddedItems) == -1) return changed;
             changed = true;
             slot++;
         }
@@ -227,7 +227,7 @@ public class ItemData {
         items[slot] = guiItem;
     }
 
-    public void removeItem(ItemStack... items) {
+    public boolean removeItem(ItemStack... items) {
         Set<ItemStack> itemStacks = ImmutableSet.copyOf(items);
         int size = menu.size();
         boolean changed = false;
