@@ -64,11 +64,10 @@ public final class MenuListeners implements Listener {
         Inventory inventory = view.getTopInventory();
         InventoryHolder holder = inventory.getHolder();
         if (!(holder instanceof Menu)) return;
-        int slot = event.getSlot(), raw = event.getRawSlot();
-
+        int slot = event.getSlot();
         Inventory clickedInventory = event.getClickedInventory();
-
         Menu menu = ((Menu) holder);
+
         if (clickedInventory == null) {
             menu.outsideClickAction.accept(event);
             return;
@@ -111,7 +110,7 @@ public final class MenuListeners implements Listener {
         if (!(holder instanceof Menu)) return;
         Menu menu = ((Menu) holder);
 
-        if (!menu.areItemsPlaceable() || isDraggingOnGui(menu.size, event.getRawSlots()))
+        if (!menu.areItemsPlaceable() && isDraggingOnGui(menu.size, event.getRawSlots()))
             event.setResult(Event.Result.DENY);
         menu.dragAction.accept(event);
     }
@@ -122,11 +121,9 @@ public final class MenuListeners implements Listener {
         InventoryHolder holder = view.getTopInventory().getHolder();
         if (!(holder instanceof Menu)) return;
         Menu menu = ((Menu) holder);
-
         menu.update();
 
         checkAnimations(event, menu);
-
         if (!menu.updating) menu.openAction.accept(event);
     }
 
