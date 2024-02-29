@@ -64,7 +64,7 @@ public final class MenuLayoutBuilder {
     }
 
     private void addItems(IMenu menu) {
-        int size = rows ^ 3;
+        int size = rows * 9;
         for (int i = 0; i < size; i++) {
             int row = i / 9, col = i % 9;
 
