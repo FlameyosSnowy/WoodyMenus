@@ -110,7 +110,7 @@ public final class MenuListeners implements Listener {
         if (!(holder instanceof Menu)) return;
         Menu menu = ((Menu) holder);
 
-        if (!menu.areItemsPlaceable() && isDraggingOnGui(menu.size, event.getRawSlots()))
+        if (menu.allModifiersAdded() || (!menu.areItemsPlaceable() && isDraggingOnGui(menu.size, event.getRawSlots())))
             event.setResult(Event.Result.DENY);
         menu.dragAction.accept(event);
     }
@@ -181,6 +181,14 @@ public final class MenuListeners implements Listener {
     }
 
     private static void executeItem(InventoryClickEvent actionEvent, Menu menu, ItemStack it, Player player, int slot) {
+        if (menu instanceof PaginatedMenu) {
+            int nextItemSlot = ((PaginatedMenu) menu).getNextItemSlot();
+            int previousItemSlot = ((PaginatedMenu) menu).getPreviousItemSlot();
+            if (slot == nextItemSlot || slot == previousItemSlot) {
+                boolean done = handlePaginatedMenu((PaginatedMenu) menu, player, slot, nextItemSlot, previousItemSlot);
+                if (done) return;
+            }
+        }
         MenuItem menuItem;
         if (it == null || (menuItem = menu.getItem(slot)) == null) return;
 
@@ -189,21 +197,17 @@ public final class MenuListeners implements Listener {
 
         if (menuItem.isOnCooldown(player)) return;
         menuItem.click(player, actionEvent);
-        if (menu instanceof PaginatedMenu) handlePaginatedMenu((PaginatedMenu) menu, player, slot);
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    private static boolean handlePaginatedMenu(@NotNull PaginatedMenu menu, Player player, int slot) {
-        if (slot != menu.getNextItemSlot() && slot != menu.getPreviousItemSlot()) return false;
-        int newNumber = menu.getPageNumber() + (menu.getNextItemSlot() == slot ? 1 : -1), oldNumber = menu.getPageNumber();
-        ItemData oldPage = menu.getPage(oldNumber), currentPage = menu.data;
+    private static boolean handlePaginatedMenu(@NotNull PaginatedMenu menu, Player player, int slot, int nextItemSlot, int previousItemSlot) {
+        int oldNumber = menu.getPageNumber(), newNumber = oldNumber + (nextItemSlot == slot ? 1 : -1);
+        ItemData oldPage = menu.data, currentPage = menu.getPage(newNumber);
 
-        // page has changed by now, execute page action
         PageChangeEvent event = new PageChangeEvent(menu, oldPage, currentPage, player, newNumber, oldNumber);
         menu.onPageChange.accept(event);
 
-        // if cancelled go back to the page it was on.
-        return !event.isCancelled() || menu.page(oldNumber);
+        return event.isCancelled();
     }
 
     private static boolean modifierDetected(@NotNull IMenu menu, InventoryAction action, InventoryType ciType, InventoryType invType) {
