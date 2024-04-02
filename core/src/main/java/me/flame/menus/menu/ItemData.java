@@ -194,7 +194,7 @@ public class ItemData {
     }
 
     public boolean removeItem(MenuItem... its) {
-        Set<MenuItem> items = ImmutableSet.copyOf(removingItems);
+        Set<MenuItem> items = ImmutableSet.copyOf(its);
         int size = menu.size();
 
         boolean changed = false;
