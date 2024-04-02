@@ -233,19 +233,19 @@ public class Menu implements IMenu, RandomAccess, Serializable {
     }
 
     public void updatePer(long repeatTime) {
-        SCHEDULER.runTaskTimer(plugin, this::update, 0, repeatTime);
+        SCHEDULER.runTaskTimer(plugin, () -> this.update(), 0, repeatTime);
     }
 
     public void updatePer(@NotNull Duration repeatTime) {
-        SCHEDULER.runTaskTimer(plugin, this::update, 0, repeatTime.toMillis() / 50);
+        SCHEDULER.runTaskTimer(plugin, () -> this.update(), 0, repeatTime.toMillis() / 50);
     }
 
     public void updatePer(long delay, long repeatTime) {
-        SCHEDULER.runTaskTimer(plugin, this::update, delay, repeatTime);
+        SCHEDULER.runTaskTimer(plugin, () -> this.update(), delay, repeatTime);
     }
 
     public void updatePer(@NotNull Duration delay, @NotNull Duration repeatTime) {
-        SCHEDULER.runTaskTimer(plugin, this::update, delay.toMillis() / 50, repeatTime.toMillis() / 50);
+        SCHEDULER.runTaskTimer(plugin, () -> this.update(), delay.toMillis() / 50, repeatTime.toMillis() / 50);
     }
 
     public void updateTitle(String title) { updateTitle(TextHolder.of(title)); }
