@@ -357,10 +357,7 @@ public final class PaginatedMenu extends Menu implements Pagination {
         if (items == null || items.length == 0) return;
 
         List<MenuItem> leftovers = new ArrayList<>();
-        for (int i = 0; i >= 0; i--) {
-            if (items.length == 0) return;
-            ItemData page = getPage(i);
-
+        for (ItemData page : pages) {
             page.addItem(leftovers, items);
             items = leftovers.toArray(new MenuItem[0]);
             leftovers.clear();
@@ -383,21 +380,11 @@ public final class PaginatedMenu extends Menu implements Pagination {
     public void setPageItem(int[] slots, MenuItem item) {
         int size = slots.length;
         for (ItemData page : pages) {
-            for (int i = 0; i < size; i++) {
-                page.setItem(slots[i], item);
-                this.pageItems.put(slots[i], item);
+            for (int slot : slots) {
+                page.setItem(slot, item);
+                this.pageItems.put(slot, item);
             }
         }
-    }
-
-    @Override
-    public void setPageItem(int slot, ItemStack item) {
-        setPageItem(slot, MenuItem.of(item));
-    }
-
-    public void setPageItem(int slot, MenuItem item) {
-        this.pageItems.put(slot, item);
-        for (ItemData page : pages) page.setItem(slot, item);
     }
 
     @Override
