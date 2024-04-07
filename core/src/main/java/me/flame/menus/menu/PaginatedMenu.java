@@ -1,0 +1,334 @@
+package me.flame.menus.menu;
+
+import com.google.common.collect.ImmutableList;
+
+import com.google.common.collect.ImmutableSet;
+import lombok.Getter;
+import lombok.Setter;
+import me.flame.menus.adventure.TextHolder;
+import me.flame.menus.events.PageChangeEvent;
+import me.flame.menus.items.MenuItem;
+import me.flame.menus.menu.fillers.*;
+import me.flame.menus.modifiers.Modifier;
+
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.ItemStack;
+
+import org.jetbrains.annotations.*;
+
+import java.util.*;
+import java.util.function.Consumer;
+
+/**
+ * Menu that allows you to have multiple pages
+ * <p>1.1.0: PaginatedMenu straight out of Triumph-GUIS</p>
+ * <p>1.4.0: PaginatedMenu rewritten as List<Page></p>
+ * <p>2.0.0: PaginatedMenu rewritten as List<ItemData> instead to improve DRY and reduce it by about 250+ lines</p>
+ * @since 2.0.0
+ * @author FlameyosFlow
+ */
+@SuppressWarnings("unused")
+public final class PaginatedMenu extends Menu implements Pagination {
+    @NotNull
+    final List<ItemData> pages;
+
+    private final Map<Integer, MenuItem> pageItems = new HashMap<>();
+
+    @Getter
+    private int pageNumber;
+
+    private @Getter int nextItemSlot = -1, previousItemSlot = -1;
+    private @Getter MenuItem nextItem, previousItem;
+
+    @Setter Consumer<PageChangeEvent> onPageChange = event -> {};
+
+    private final MenuFiller pageDecorator = PageDecoration.create(this);
+
+    public <T extends MenuFiller> T getPageDecorator(Class<T> pageClass) {
+        return pageClass.cast(pageDecorator);
+    }
+
+    /**
+     * Adds a blank page to the menu.
+     * @return the index the page was added at
+     */
+    public int addPage() {
+        pages.add(new ItemData(this));
+        return pages.size() - 1;
+    }
+
+    public void setPageItems(ItemData items) {
+        if (pageItems == null) return;
+        for (int i : pageItems.keySet()) items.setItem(i, pageItems.get(i));
+        if (nextItemSlot != -1) items.setItem(nextItemSlot, pages.get(0).getItem(nextItemSlot));
+        if (previousItemSlot != -1) items.setItem(previousItemSlot, pages.get(0).getItem(previousItemSlot));
+    }
+
+    /**
+     * Main constructor to provide a way to create PaginatedMenu
+     *
+     * @param pageRows The page size.
+     */
+    PaginatedMenu(final int pageRows, final int pageCount, TextHolder title, EnumSet<Modifier> modifiers, MenuItem nextItem, MenuItem previousItem, int nextItemSlot, int previousItemSlot) {
+        super(pageRows, title, modifiers);
+        this.pages = new ArrayList<>(pageCount);
+
+        for (int pageIndex = 0; pageIndex < pageCount; pageIndex++)
+            pages.add(new ItemData(this));
+        this.data = pages.get(pageNumber);
+    }
+
+    /**
+     * Main constructor to provide a way to create PaginatedMenu
+     */
+    PaginatedMenu(MenuType type, final int pageCount, TextHolder title, EnumSet<Modifier> modifiers, MenuItem nextItem, MenuItem previousItem, int nextItemSlot, int previousItemSlot) {
+        super(type, title, modifiers);
+        this.pages = new ArrayList<>(pageCount);
+
+        for (int pageIndex = 0; pageIndex < pageCount; pageIndex++)
+            pages.add(new ItemData(this));
+        this.data = pages.get(pageNumber);
+    }
+
+    public ImmutableList<ItemData> pages() { return ImmutableList.copyOf(pages); }
+
+    public void setNextPageItem(int nextItemSlot, MenuItem nextItem) {
+        this.nextItemSlot = nextItemSlot;
+        this.setItem(nextItemSlot, nextItem);
+    }
+
+    public void setPreviousPageItem(int previousItemSlot, MenuItem previousItem) {
+        this.previousItemSlot = previousItemSlot;
+        this.setItem(previousItemSlot, previousItem);
+    }
+
+    public static @NotNull PaginatedMenu create(MenuData data) {
+        Menu menu = data.intoMenu();
+        try { return (PaginatedMenu) menu; } catch (ClassCastException error) {
+            throw new IllegalArgumentException(
+                "Attempted to create a PaginatedMenu from an incompatible MenuData object." +
+                "\nExpected PaginatedMenu, but got " + data.getClass().getSimpleName() +
+                "\nFix: MenuData must include the size of the pages, or it'll default to 1."
+            );
+        }
+    }
+
+    public void recreateInventory() {
+        super.recreateInventory();
+        pages.forEach((data) -> {
+            if (data != this.data) data.recreateInventory();
+        });
+    }
+
+    @Override
+    public void setContents(MenuItem... items) {
+        data.contents(items);
+    }
+
+    /**
+     * Opens the GUI to a specific page for the given player
+     *
+     * @param player   The {@link HumanEntity} to open the GUI to
+     * @param openPage The specific page to open at
+     */
+    public void open(@NotNull final HumanEntity player, final int openPage) {
+        if (player.isSleeping()) return;
+
+        int pagesSize = pages.size();
+        if (openPage < 0 || openPage >= pagesSize) {
+            throw new IllegalArgumentException(
+                    "\"openPage\" out of bounds; must be 0-" + (pagesSize - 1) +
+                    "\nopenPage: " + openPage +
+                    "\nFix: Make sure \"openPage\" is 0-" + (pagesSize - 1)
+            );
+        }
+
+        this.pageNumber = openPage;
+        this.data = pages.get(openPage);
+        player.openInventory(inventory);
+    }
+
+    /**
+     * Opens the GUI to a specific page for the given player
+     *
+     * @param player   The {@link HumanEntity} to open the GUI to
+     */
+    public void open(@NotNull final HumanEntity player) {
+        this.open(player, 0);
+    }
+
+    /**
+     * Gets the current page number (Inflated by 1)
+     *
+     * @return The current page number
+     */
+    @Override
+    public int getCurrentPageNumber() {
+        return pageNumber + 1;
+    }
+
+    /**
+     * Gets the number of pages the GUI has
+     *
+     * @return The number of pages
+     */
+    @Override
+    public int getPagesSize() {
+        return pages.size();
+    }
+
+    /**
+     * Goes to the next page
+     *
+     * @return False if there is no next page.
+     */
+    @Override
+    public boolean next() {
+        return page(pageNumber + 1);
+    }
+
+    /**
+     * Goes to the previous page if possible
+     *
+     * @return False if there is no previous page.
+     */
+    @Override
+    public boolean previous() {
+        return page(pageNumber - 1);
+    }
+
+    /**
+     * Goes to the specified page
+     *
+     * @return False if there is no next page.
+     */
+    @Override
+    public boolean page(int pageNum) {
+        int size = pages.size();
+        if (pageNum < 0 || pageNum >= size) return false;
+
+        this.pageNumber = pageNum;
+        this.data = pages.get(pageNum);
+        update(true);
+        return true;
+    }
+
+    @Override
+    public @Nullable ItemData getPage(int index) {
+        return (index < 0 || index > pages.size()) ? null : pages.get(index);
+    }
+
+    @Override
+    public Optional<ItemData> getOptionalPage(int index) {
+        return (index < 0 || index > pages.size()) ? Optional.empty() : Optional.ofNullable(getPage(index));
+    }
+
+    @Override
+    public void addPageItems(MenuItem... items) {
+        for (ItemData page : pages) page.addItem(items);
+    }
+
+    @Override
+    public void addPageItems(ItemStack... items) {
+        for (ItemData page : pages) page.addItem(items);
+    }
+
+    @Override
+    public void removePageItem(int slot) {
+        for (ItemData page : pages) page.removeItem(slot);
+    }
+
+    @Override
+    public void removePageItem(ItemStack slot) {
+        for (ItemData page : pages) page.removeItem(slot);
+    }
+
+    @Override
+    public void removePageItem(MenuItem slot) {
+        for (ItemData page : pages) page.removeItem(slot);
+    }
+
+    @Override
+    public void removePageItem(ItemStack... slot) {
+        Set<ItemStack> set = ImmutableSet.copyOf(slot);
+        for (ItemData page : pages) page.removeItem(slot);
+    }
+
+    @Override
+    public void removePageItem(MenuItem... slot) {
+        Set<MenuItem> set = ImmutableSet.copyOf(slot);
+        for (ItemData page : pages) page.removeItem(slot);
+    }
+
+    @Override
+    public void setPageItem(int[] slots, MenuItem[] items) {
+        int size = slots.length;
+        if (size != items.length) throw new IllegalArgumentException("Number of slots and number of items must be equal.");
+        for (ItemData page : pages) {
+            for (int i = 0; i < size; i++) {
+                page.setItem(slots[i], items[i]);
+                this.pageItems.put(slots[i], items[i]);
+            }
+        }
+    }
+
+    @Override
+    public void setPageItem(int slot, ItemStack item) {
+        setPageItem(slot, MenuItem.of(item));
+    }
+
+    public void setPageItem(int slot, MenuItem item) {
+        this.pageItems.put(slot, item);
+        for (ItemData page : pages) page.setItem(slot, item);
+    }
+
+    public void addItems(@NotNull MenuItem... items) {
+        if (items == null || items.length == 0) return;
+
+        List<MenuItem> leftovers = new ArrayList<>();
+        for (int i = 0; i < pages.size(); i++) {
+            @NotNull
+            MenuItem[] finalItems = items;
+            getOptionalPage(i).ifPresent(page -> page.addItem(leftovers, finalItems));
+            items = leftovers.toArray(new MenuItem[0]);
+            leftovers.clear();
+        }
+        if (!dynamicSizing) return;
+
+        int newestPageNumber = pageNumber;
+        while (items.length != 0) {
+            int newPageNum = addPage();
+            newestPageNumber = newPageNum;
+
+            @NotNull
+            MenuItem[] finalItems = items;
+            getOptionalPage(newPageNum).ifPresent(page -> page.addItem(leftovers, finalItems));
+
+            items = leftovers.toArray(new MenuItem[0]);
+            leftovers.clear();
+        }
+
+        page(newestPageNumber);
+    }
+
+    public void setPageItem(int[] slots, MenuItem item) {
+        int size = slots.length;
+        for (ItemData page : pages) {
+            for (int slot : slots) {
+                page.setItem(slot, item);
+                this.pageItems.put(slot, item);
+            }
+        }
+    }
+
+    public @NotNull MenuData getMenuData() { return MenuData.intoData(this); }
+
+    public PaginatedMenu copy() {
+        return create(getMenuData());
+    }
+
+    public void setContents(ItemData data) {
+        this.data = data;
+        this.changed = true;
+    }
+}
