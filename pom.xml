@@ -6,7 +6,7 @@
 
     <groupId>me.flame.menus</groupId>
     <artifactId>core-project</artifactId>
-    <version>2.0.0</version>
+    <version>3.0.0</version>
     <packaging>pom</packaging>
     <modules>
         <module>core</module>
@@ -23,6 +23,10 @@
         <repository>
             <id>minecraft</id>
             <url>https://libraries.minecraft.net/</url>
+        </repository>
+        <repository>
+            <id>jitpack</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
     <build>
@@ -94,6 +98,14 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>foxikle-flameyos</id>
+            <url>http://repo.foxikle.dev/#/flameyos</url>
+        </repository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>com.mojang</groupId>
